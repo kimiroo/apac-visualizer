@@ -58,4 +58,4 @@ If you haven't installed Git, follow this guide instead.
 3. Extract contents and launch `run.bat` to start the main application.
 
 ## Updating geodata
-If geodata (e.g. province) is been outdated, run `get_geodata.bat` to retrieve latest geodata.
+If geodata (e.g. province) is outdated, run `get_geodata.bat` to retrieve latest geodata.
