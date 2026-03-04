@@ -1,5 +1,7 @@
 # APAC Visualizer++
-<video src="resource/mollu.mp4" loop muted playsinline loading="lazy"></video>
+![MOL?LU](assets/mollu.webp)
+
+Visualizer for partner and plant overview
 
 ## Requirements
 - Python 3.10+

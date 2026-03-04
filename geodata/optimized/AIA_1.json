@@ -1,0 +1,25 @@
+{
+"type": "FeatureCollection",
+"name": "AIA_1",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "GID_0": "AIA", "NAME_1": "BlowingPoint" }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -63.0763, 18.1863 ], [ -63.101, 18.1682 ], [ -63.1121, 18.1791 ], [ -63.0763, 18.1863 ] ] ] } },
+{ "type": "Feature", "properties": { "GID_0": "AIA", "NAME_1": "DogIsland" }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -63.2594, 18.2743 ], [ -63.2437, 18.2817 ], [ -63.2364, 18.2824 ], [ -63.2594, 18.2743 ] ] ] } },
+{ "type": "Feature", "properties": { "GID_0": "AIA", "NAME_1": "EastEnd" }, "geometry": { "type": "MultiPolygon", "coordinates": [ [ [ [ -62.9951, 18.2465 ], [ -62.9853, 18.2301 ], [ -63.0034, 18.23 ], [ -62.9951, 18.2465 ] ] ], [ [ [ -63.0127, 18.2521 ], [ -63.0117, 18.2361 ], [ -63.0168, 18.2342 ], [ -63.0127, 18.2521 ] ] ] ] } },
+{ "type": "Feature", "properties": { "GID_0": "AIA", "NAME_1": "GeorgeHill" }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -63.0543, 18.1907 ], [ -63.079, 18.21 ], [ -63.0516, 18.2109 ], [ -63.0543, 18.1907 ] ] ] } },
+{ "type": "Feature", "properties": { "GID_0": "AIA", "NAME_1": "IslandHarbour" }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -62.9683, 18.2732 ], [ -62.9951, 18.2465 ], [ -63.0171, 18.2552 ], [ -62.9683, 18.2732 ] ] ] } },
+{ "type": "Feature", "properties": { "GID_0": "AIA", "NAME_1": "NorthHill" }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -63.09, 18.209 ], [ -63.0784, 18.2005 ], [ -63.0925, 18.2045 ], [ -63.09, 18.209 ] ] ] } },
+{ "type": "Feature", "properties": { "GID_0": "AIA", "NAME_1": "NorthSide" }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -63.0295, 18.2562 ], [ -63.0505, 18.2169 ], [ -63.0711, 18.2332 ], [ -63.0295, 18.2562 ] ] ] } },
+{ "type": "Feature", "properties": { "GID_0": "AIA", "NAME_1": "PriclyPearCays" }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -63.1769, 18.2651 ], [ -63.1714, 18.2652 ], [ -63.1701, 18.2616 ], [ -63.1769, 18.2651 ] ] ] } },
+{ "type": "Feature", "properties": { "GID_0": "AIA", "NAME_1": "SandyGround" }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -63.0915, 18.1968 ], [ -63.0842, 18.2037 ], [ -63.0784, 18.2005 ], [ -63.0915, 18.1968 ] ] ] } },
+{ "type": "Feature", "properties": { "GID_0": "AIA", "NAME_1": "SandyHill" }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -62.9951, 18.2465 ], [ -62.9968, 18.2218 ], [ -63.0359, 18.223 ], [ -63.0348, 18.2355 ], [ -62.9951, 18.2465 ] ] ] } },
+{ "type": "Feature", "properties": { "GID_0": "AIA", "NAME_1": "ScrubIsland" }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -62.9575, 18.2887 ], [ -62.9267, 18.2898 ], [ -62.9595, 18.277 ], [ -62.9575, 18.2887 ] ] ] } },
+{ "type": "Feature", "properties": { "GID_0": "AIA", "NAME_1": "SombreroIsland" }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -63.426, 18.5858 ], [ -63.4278, 18.5903 ], [ -63.4232, 18.5918 ], [ -63.426, 18.5858 ] ] ] } },
+{ "type": "Feature", "properties": { "GID_0": "AIA", "NAME_1": "SouthHill" }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -63.0763, 18.1863 ], [ -63.1052, 18.1837 ], [ -63.1208, 18.1728 ], [ -63.1219, 18.1925 ], [ -63.0763, 18.1863 ] ] ] } },
+{ "type": "Feature", "properties": { "GID_0": "AIA", "NAME_1": "StoneyGround" }, "geometry": { "type": "MultiPolygon", "coordinates": [ [ [ [ -63.0381, 18.2119 ], [ -63.0477, 18.2363 ], [ -63.0348, 18.2355 ], [ -63.0381, 18.2119 ] ] ], [ [ [ -63.0295, 18.2562 ], [ -63.0168, 18.2342 ], [ -63.0348, 18.2355 ], [ -63.0295, 18.2562 ] ] ] ] } },
+{ "type": "Feature", "properties": { "GID_0": "AIA", "NAME_1": "TheFarrington" }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -63.0359, 18.223 ], [ -63.0075, 18.2227 ], [ -63.0354, 18.2009 ], [ -63.0359, 18.223 ] ] ] } },
+{ "type": "Feature", "properties": { "GID_0": "AIA", "NAME_1": "TheQuarter" }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -63.0543, 18.1907 ], [ -63.0505, 18.2169 ], [ -63.0426, 18.2166 ], [ -63.0354, 18.2009 ], [ -63.0543, 18.1907 ] ] ] } },
+{ "type": "Feature", "properties": { "GID_0": "AIA", "NAME_1": "TheValley" }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -63.0628, 18.22 ], [ -63.0693, 18.2052 ], [ -63.0758, 18.2128 ], [ -63.0628, 18.22 ] ] ] } },
+{ "type": "Feature", "properties": { "GID_0": "AIA", "NAME_1": "WestEnd" }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -63.1343, 18.1894 ], [ -63.1254, 18.169 ], [ -63.1721, 18.1617 ], [ -63.1343, 18.1894 ] ] ] } }
+]
+}

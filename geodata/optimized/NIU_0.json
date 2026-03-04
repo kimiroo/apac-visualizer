@@ -1,0 +1,8 @@
+{
+"type": "FeatureCollection",
+"name": "NIU_0",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "GID_0": "NIU" }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -169.8506, -19.1476 ], [ -169.9222, -19.1361 ], [ -169.9508, -19.0747 ], [ -169.8964, -18.9731 ], [ -169.8467, -18.9522 ], [ -169.8039, -18.9669 ], [ -169.7736, -19.0622 ], [ -169.8506, -19.1476 ] ] ] } }
+]
+}

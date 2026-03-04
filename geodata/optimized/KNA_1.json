@@ -1,0 +1,21 @@
+{
+"type": "FeatureCollection",
+"name": "KNA_1",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "GID_0": "KNA", "NAME_1": "ChristChurchNicholaTown" }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -62.7651, 17.3907 ], [ -62.741, 17.3768 ], [ -62.7597, 17.3351 ], [ -62.7941, 17.3549 ], [ -62.7651, 17.3907 ] ] ] } },
+{ "type": "Feature", "properties": { "GID_0": "KNA", "NAME_1": "SaintAnneSandyPoint" }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -62.8425, 17.3451 ], [ -62.864, 17.3701 ], [ -62.8621, 17.3908 ], [ -62.8102, 17.3724 ], [ -62.8425, 17.3451 ] ] ] } },
+{ "type": "Feature", "properties": { "GID_0": "KNA", "NAME_1": "SaintGeorgeBasseterre" }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -62.7546, 17.3256 ], [ -62.6246, 17.2501 ], [ -62.6268, 17.226 ], [ -62.6576, 17.2126 ], [ -62.6646, 17.2665 ], [ -62.7443, 17.2899 ], [ -62.7546, 17.3256 ] ] ] } },
+{ "type": "Feature", "properties": { "GID_0": "KNA", "NAME_1": "SaintGeorgeGingerland" }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -62.5396, 17.1415 ], [ -62.5529, 17.1051 ], [ -62.5772, 17.1026 ], [ -62.5834, 17.1534 ], [ -62.5396, 17.1415 ] ] ] } },
+{ "type": "Feature", "properties": { "GID_0": "KNA", "NAME_1": "SaintJamesWindward" }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -62.5396, 17.1415 ], [ -62.5834, 17.1534 ], [ -62.6126, 17.2035 ], [ -62.5549, 17.1946 ], [ -62.5396, 17.1415 ] ] ] } },
+{ "type": "Feature", "properties": { "GID_0": "KNA", "NAME_1": "SaintJohnCapisterre" }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -62.7651, 17.3907 ], [ -62.7941, 17.3549 ], [ -62.8243, 17.3843 ], [ -62.8046, 17.4121 ], [ -62.7651, 17.3907 ] ] ] } },
+{ "type": "Feature", "properties": { "GID_0": "KNA", "NAME_1": "SaintJohnFigtree" }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -62.5834, 17.1534 ], [ -62.5772, 17.1026 ], [ -62.6029, 17.0935 ], [ -62.6335, 17.1332 ], [ -62.5834, 17.1534 ] ] ] } },
+{ "type": "Feature", "properties": { "GID_0": "KNA", "NAME_1": "SaintMaryCayon" }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -62.7592, 17.3352 ], [ -62.7399, 17.3774 ], [ -62.7088, 17.3404 ], [ -62.7207, 17.3358 ], [ -62.7592, 17.3352 ] ] ] } },
+{ "type": "Feature", "properties": { "GID_0": "KNA", "NAME_1": "SaintPaulCapisterre" }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -62.8104, 17.3727 ], [ -62.8458, 17.3897 ], [ -62.8621, 17.3918 ], [ -62.8099, 17.4179 ], [ -62.8104, 17.3727 ] ] ] } },
+{ "type": "Feature", "properties": { "GID_0": "KNA", "NAME_1": "SaintPaulCharlestown" }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -62.5834, 17.1535 ], [ -62.6007, 17.138 ], [ -62.6307, 17.1335 ], [ -62.6299, 17.1442 ], [ -62.5834, 17.1535 ] ] ] } },
+{ "type": "Feature", "properties": { "GID_0": "KNA", "NAME_1": "SaintPeterBasseterre" }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -62.6832, 17.2947 ], [ -62.7467, 17.3169 ], [ -62.7544, 17.3332 ], [ -62.7088, 17.3402 ], [ -62.6832, 17.2947 ] ] ] } },
+{ "type": "Feature", "properties": { "GID_0": "KNA", "NAME_1": "SaintThomasLowland" }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -62.614, 17.1968 ], [ -62.5834, 17.1535 ], [ -62.6299, 17.1442 ], [ -62.6282, 17.1715 ], [ -62.614, 17.1968 ] ] ] } },
+{ "type": "Feature", "properties": { "GID_0": "KNA", "NAME_1": "SaintThomasMiddleIsland" }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -62.8425, 17.3451 ], [ -62.7669, 17.3363 ], [ -62.7943, 17.3108 ], [ -62.8425, 17.3451 ] ] ] } },
+{ "type": "Feature", "properties": { "GID_0": "KNA", "NAME_1": "TrinityPalmettoPoint" }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -62.7946, 17.3101 ], [ -62.7544, 17.3332 ], [ -62.7463, 17.2924 ], [ -62.7946, 17.3101 ] ] ] } }
+]
+}

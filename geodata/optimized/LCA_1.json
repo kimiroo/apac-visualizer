@@ -1,0 +1,17 @@
+{
+"type": "FeatureCollection",
+"name": "LCA_1",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "GID_0": "LCA", "NAME_1": "Anse-la-Raye" }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -61.0332, 13.9601 ], [ -60.9839, 13.9194 ], [ -61.0106, 13.854 ], [ -61.0471, 13.9385 ], [ -61.0332, 13.9601 ] ] ] } },
+{ "type": "Feature", "properties": { "GID_0": "LCA", "NAME_1": "Canaries" }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -61.0471, 13.9385 ], [ -61.0183, 13.9032 ], [ -61.0391, 13.8818 ], [ -61.0715, 13.8962 ], [ -61.0471, 13.9385 ] ] ] } },
+{ "type": "Feature", "properties": { "GID_0": "LCA", "NAME_1": "Castries" }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -60.9894, 13.8759 ], [ -60.9907, 13.9467 ], [ -61.0332, 13.9601 ], [ -60.9726, 14.0383 ], [ -60.9281, 13.9938 ], [ -60.9894, 13.8759 ] ] ] } },
+{ "type": "Feature", "properties": { "GID_0": "LCA", "NAME_1": "Choiseul" }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -61.0316, 13.7689 ], [ -61.0691, 13.801 ], [ -60.9988, 13.8436 ], [ -61.0316, 13.7689 ] ] ] } },
+{ "type": "Feature", "properties": { "GID_0": "LCA", "NAME_1": "Dennery" }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -60.9715, 13.8766 ], [ -60.9354, 13.9696 ], [ -60.8724, 13.9613 ], [ -60.8826, 13.8782 ], [ -60.9715, 13.8766 ] ] ] } },
+{ "type": "Feature", "properties": { "GID_0": "LCA", "NAME_1": "GrosIslet" }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -60.9442, 13.9613 ], [ -60.9281, 13.996 ], [ -60.9771, 14.0585 ], [ -60.9451, 14.1104 ], [ -60.8832, 14.0518 ], [ -60.8732, 13.976 ], [ -60.9442, 13.9613 ] ] ] } },
+{ "type": "Feature", "properties": { "GID_0": "LCA", "NAME_1": "Laborie" }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -61.039, 13.7618 ], [ -61.0058, 13.8301 ], [ -60.9988, 13.8348 ], [ -60.9804, 13.7351 ], [ -61.039, 13.7618 ] ] ] } },
+{ "type": "Feature", "properties": { "GID_0": "LCA", "NAME_1": "Micoud" }, "geometry": { "type": "MultiPolygon", "coordinates": [ [ [ [ -60.9235, 13.7665 ], [ -60.9221, 13.7637 ], [ -60.9251, 13.7646 ], [ -60.9235, 13.7665 ] ] ], [ [ [ -60.9827, 13.8671 ], [ -60.8799, 13.8712 ], [ -60.909, 13.7612 ], [ -60.9246, 13.769 ], [ -60.9405, 13.7587 ], [ -60.9545, 13.7752 ], [ -60.9827, 13.8671 ] ] ] ] } },
+{ "type": "Feature", "properties": { "GID_0": "LCA", "NAME_1": "Soufrière" }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -61.0737, 13.8935 ], [ -61.0137, 13.8545 ], [ -60.98, 13.8612 ], [ -61.076, 13.804 ], [ -61.0737, 13.8935 ] ] ] } },
+{ "type": "Feature", "properties": { "GID_0": "LCA", "NAME_1": "VieuxFort" }, "geometry": { "type": "MultiPolygon", "coordinates": [ [ [ [ -60.9337, 13.7249 ], [ -60.9304, 13.7221 ], [ -60.9329, 13.7218 ], [ -60.9337, 13.7249 ] ] ], [ [ [ -60.9799, 13.7326 ], [ -60.993, 13.8427 ], [ -60.9636, 13.81 ], [ -60.9417, 13.7591 ], [ -60.9251, 13.7599 ], [ -60.939, 13.7085 ], [ -60.9799, 13.7326 ] ] ] ] } }
+]
+}
