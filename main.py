@@ -236,4 +236,4 @@ with col2:
         st.write(f'You clicked on: {clicked_info}')
         # You can filter your Pandas DataFrame here and show charts
     else:
-        st.info('Click a region or a factory pin on the map to see details.')
+        st.info('Click a region or a pin on the map to see details.')
