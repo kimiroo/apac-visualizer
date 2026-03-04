@@ -49,7 +49,6 @@ for partner in sheet_partner.iter_rows(2):
 
     # Append boolean values for industry columns dynamically
     for industry in config['industries']:
-        print(industry, partner[headers_partner_sheet[industry]].value)
         row_data.append(
             bool(partner[headers_partner_sheet[industry]].value)
         )
