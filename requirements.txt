@@ -1,0 +1,12 @@
+beautifulsoup4
+folium
+geopandas
+openpyxl
+osmnx
+pycountry
+pyogrio
+PyYAML
+requests
+streamlit
+streamlit_folium
+topojson

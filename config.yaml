@@ -1,0 +1,22 @@
+app:
+  title: APAC Interactive Factory Map
+source:
+  filename: 'Dataset.xlsx'
+  sheetName:
+    partner: Partner List
+    plant: Plant List
+industries:
+  - F&B
+  - Heavy Industry
+  - Chemical/Pharma
+  - Electronics
+  - Mobility
+tiers:
+  - name: Elite
+    color: orange
+  - name: Certified
+    color: darkgreen
+  - name: Authorized
+    color: cadetblue
+  - name: Probation
+    color: lightgray

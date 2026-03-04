@@ -1,0 +1,6 @@
+/.venv
+/geodata
+/cache
+__pycache__
+*.pyc
+*.xlsx
