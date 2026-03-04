@@ -109,6 +109,18 @@ selected_tiers = st.sidebar.multiselect(
 show_partner = st.sidebar.checkbox('Partner', value=True)
 show_plant = st.sidebar.checkbox('Plant', value=True)
 
+column_ratio_options = [
+    {'name': '7:3', 'value': [7, 3]},
+    {'name': '5:5', 'value': [5, 5]},
+    {'name': '3:7', 'value': [3, 7]}
+]
+
+selected_column_ratio = st.sidebar.selectbox(
+    'Split Ratio',
+    options=column_ratio_options,
+    format_func=lambda x: x['name']
+)
+
 
 ##############
 ### Filter ###
@@ -167,7 +179,7 @@ if not show_plant:
 ##############
 
 # Create two columns: Map (Left) and Information (Right)
-col1, col2 = st.columns([7, 3])
+col1, col2 = st.columns(selected_column_ratio['value'])
 
 with col1:
     # 2. Initialize Folium Map
