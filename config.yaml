@@ -1,5 +1,6 @@
 app:
   title: APAC Interactive Factory Map
+  favicon: assets/plana.png
 source:
   filename: 'Dataset.xlsx'
   sheetName:

@@ -26,7 +26,11 @@ tier_color_map = {t['name']: t['color'] for t in config['tiers']}
 ############
 
 # Set page to wide mode for the side panel layout
-st.set_page_config(layout='wide')
+st.set_page_config(
+    page_title=config['app']['title'],
+    page_icon=config['app']['favicon'],
+    layout='wide'
+)
 st.title(config['app']['title'])
 
 # Load geodata
