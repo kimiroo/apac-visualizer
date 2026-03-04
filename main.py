@@ -119,6 +119,9 @@ column_ratio_options = [
     {'name': '3:7', 'value': [3, 7]}
 ]
 
+# View
+st.sidebar.header('View')
+
 selected_column_ratio = st.sidebar.selectbox(
     'Split Ratio',
     options=column_ratio_options,
