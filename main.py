@@ -209,7 +209,7 @@ with col1:
         if pd.notnull(row['lat']) and pd.notnull(row['long']):
             folium.Marker(
                 location=[row['lat'], row['long']],
-                tooltip=row['id_name'],
+                tooltip=f'<b>Plant:</b> {row['id_name']}',
                 icon=folium.Icon(color='pink', icon='industry', prefix='fa')
             ).add_to(m)
 
@@ -221,7 +221,7 @@ with col1:
         if pd.notnull(row['lat']) and pd.notnull(row['long']):
             folium.Marker(
                 location=[row['lat'], row['long']],
-                tooltip=row['name'],
+                tooltip=f'<b>Partner:</b> {row['name']} ({row['id']})<br>Revenue: {row['revenue']:,.2f} {config['data']['currency']}',
                 icon=folium.Icon(color=pin_color, icon='briefcase', prefix='fa')
             ).add_to(m)
 

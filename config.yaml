@@ -5,6 +5,8 @@ source:
   sheetName:
     partner: Partner List
     plant: Plant List
+data:
+  currency: USD
 industries:
   - F&B
   - Heavy Industry
