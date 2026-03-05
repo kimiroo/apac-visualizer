@@ -1,10 +1,9 @@
 import re
 
-filter_click_type = r'^(?:\s*)(Region|Partner):'
+filter_click_type = r'^(?:\s*)(Region|Dealer):'
 
 filter_region = r'(?:\s+)(.+)'
-filter_partner = r'^Partner: .* \((.*)\)Revenue:'
-filter_plant = r'^Plant: (.*)$'
+filter_dealer = r'^Dealer: .* \((.*)\)'
 
 def parse_click(tooltip_string):
     """
@@ -22,8 +21,8 @@ def parse_click(tooltip_string):
 
         return 'region', region
 
-    elif found[0] == 'Partner':
-        found_id = re.findall(filter_partner, tooltip_string)
-        partner_id = found_id[0]
+    elif found[0] == 'Dealer':
+        found_id = re.findall(filter_dealer, tooltip_string)
+        dealer_id = found_id[0]
 
-        return 'partner', partner_id
+        return 'dealer', dealer_id

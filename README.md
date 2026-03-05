@@ -1,7 +1,7 @@
 # APAC Visualizer++
 ![MOL?LU](assets/mollu.webp)
 
-Visualizer for partner and plant overview
+Visualizer for dealer and plant overview
 
 ## Requirements
 - Python 3.10+
@@ -48,7 +48,7 @@ If you previously have used alternate method to install Python 3, you should fol
 
 ## Launching APAC Visualizer++
 1. If you have installed Git, open `cmd` or `PowerShell` and `cd` into desired location.\
-(e.g. If you want to store files at Desktop, type `cd "C:\Users\[USERNAME]\Desktop"`. `[USERNAME]` is your username.)\
+(e.g. If you want to store files at Desktop, type `cd "C:\Users\[USERNAME]\Desktop"`. `[USERNAME]` is your username.)
 2. Run `git clone https://github.com/kimiroo/apac-visualizer` in your command prompt to retrieve latest files.
 3. Launch `run.bat` to start the main application. Python will automatically open a web app in your browser's new tab.
 

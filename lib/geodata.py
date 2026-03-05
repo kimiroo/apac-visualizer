@@ -55,9 +55,9 @@ class GeoData:
 def filter_by_geometry(dataframe, country_gdf):
     # Convert DataFrame to GeoDataFrame
     geometry = [Point(xy) for xy in zip(dataframe['long'], dataframe['lat'])]
-    partner_gdf = gpd.GeoDataFrame(dataframe, geometry=geometry, crs="EPSG:4326")
+    gdf = gpd.GeoDataFrame(dataframe, geometry=geometry, crs="EPSG:4326")
 
     # Spatial Join
-    filtered_by_geo = gpd.sjoin(partner_gdf, country_gdf, predicate='within')
+    filtered_by_geo = gpd.sjoin(gdf, country_gdf, predicate='within')
 
     return filtered_by_geo

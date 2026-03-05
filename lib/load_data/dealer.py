@@ -4,7 +4,7 @@ import pandas as pd
 if TYPE_CHECKING:
     from openpyxl.workbook.workbook import _WorksheetOrChartsheetLike
 
-class PartnerData:
+class DealerData:
     def __init__(self, config):
         self.df: pd.DataFrame = None
         self._config = config

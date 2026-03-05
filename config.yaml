@@ -8,8 +8,8 @@ source:
       name: Region Vertical Overview
       addOthers: True
       addTotal: True
-    partner:
-      name: Partner List
+    dealer:
+      name: Dealer List
     keyAccount:
       name: Key Account List
 data:

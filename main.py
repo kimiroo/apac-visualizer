@@ -8,7 +8,7 @@ import openpyxl as xl
 from lib.click_parser import parse_click
 from lib.geodata import GeoData, filter_by_geometry
 from lib.load_data.key_account import KeyAccountData
-from lib.load_data.partner import PartnerData
+from lib.load_data.dealer import DealerData
 
 ##############
 ### Config ###
@@ -39,13 +39,13 @@ gd = GeoData()
 # Load Excel data
 doc = xl.open(config['source']['filename'])
 sheet_region = doc[config['source']['sheet']['region']['name']]
-sheet_partner = doc[config['source']['sheet']['partner']['name']]
+sheet_dealer = doc[config['source']['sheet']['dealer']['name']]
 sheet_key_account = doc[config['source']['sheet']['keyAccount']['name']]
 
-data_partner = PartnerData(config)
+data_dealer = DealerData(config)
 data_key_account = KeyAccountData()
 
-data_partner.load(sheet_partner)
+data_dealer.load(sheet_dealer)
 data_key_account.load(sheet_key_account)
 
 
@@ -105,11 +105,11 @@ selected_column_ratio = st.sidebar.selectbox(
 geojson, is_level_1 = gd.get_geojson(selected_country['code'])
 
 ### Shallow copy DataFrames
-df_filtered_partner = data_partner.df.copy()
+df_filtered_dealer = data_dealer.df.copy()
 
 ### Filter country
 if geojson is not None and not geojson.empty:
-    df_filtered_partner = filter_by_geometry(df_filtered_partner, geojson)
+    df_filtered_dealer = filter_by_geometry(df_filtered_dealer, geojson)
 
 ### Filter vertical
 actual_verticals = [i for i in selected_verticals if i != 'None']
@@ -117,23 +117,23 @@ include_none = 'None' in selected_verticals
 
 # Mask for rows where at least one selected vertical is True
 if actual_verticals:
-    vertical_mask = df_filtered_partner[actual_verticals].any(axis=1)
+    vertical_mask = df_filtered_dealer[actual_verticals].any(axis=1)
 else:
-    vertical_mask = pd.Series(False, index=df_filtered_partner.index)
+    vertical_mask = pd.Series(False, index=df_filtered_dealer.index)
 
 # Mask for rows where ALL vertical columns are False (None case)
 if include_none:
     all_verticals = config['vertical']
-    none_mask = ~df_filtered_partner[all_verticals].any(axis=1)
+    none_mask = ~df_filtered_dealer[all_verticals].any(axis=1)
     is_in_selected_verticals = vertical_mask | none_mask
 else:
     is_in_selected_verticals = vertical_mask
 
 # Final filtering
-df_filtered_partner = df_filtered_partner[is_in_selected_verticals]
+df_filtered_dealer = df_filtered_dealer[is_in_selected_verticals]
 
 ### Filter tier
-df_filtered_partner = df_filtered_partner[(df_filtered_partner['tier'].isin(selected_tiers))]
+df_filtered_dealer = df_filtered_dealer[(df_filtered_dealer['tier'].isin(selected_tiers))]
 
 
 ##############
@@ -165,13 +165,13 @@ with col1:
 
         m.fit_bounds([sw, ne])
 
-    # Draw partner pins
-    for _, row in df_filtered_partner.iterrows():
+    # Draw dealer pins
+    for _, row in df_filtered_dealer.iterrows():
         # Check for NaN coordinates to avoid errors
         if pd.notnull(row['lat']) and pd.notnull(row['long']):
             folium.Marker(
                 location=[row['lat'], row['long']],
-                tooltip=f'''<b>Partner:</b> {row['name']} ({row['id']})<br>
+                tooltip=f'''<b>Dealer:</b> {row['name']} ({row['id']})<br>
                             Actual Revenue: {row['actual_revenue']:,.2f} {config['data']['currency']}<br>
                             Projected Revenue: {row['projected_revenue']:,.2f} {config['data']['currency']}''',
                 icon=folium.Icon(color=tier_color_map.get(row['tier'], 'blue'), icon='briefcase', prefix='fa')
