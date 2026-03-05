@@ -6,7 +6,7 @@ source:
   sheet:
     region:
       name: Region Vertical Overview
-      addOther: True
+      addOthers: True
       addTotal: True
     partner:
       name: Partner List
