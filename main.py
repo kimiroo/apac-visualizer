@@ -1,16 +1,14 @@
-import re
-import json
-
 import yaml
 import streamlit as st
 import folium
 from streamlit_folium import st_folium
 import pandas as pd
 import openpyxl as xl
-import geopandas as gpd
 
 from lib.click_parser import parse_click
 from lib.geodata import GeoData, filter_by_geometry
+from lib.load_data.key_account import KeyAccountData
+from lib.load_data.partner import PartnerData
 
 ##############
 ### Config ###
@@ -42,44 +40,20 @@ gd = GeoData()
 doc = xl.open(config['source']['filename'])
 sheet_region = doc[config['source']['sheet']['region']['name']]
 sheet_partner = doc[config['source']['sheet']['partner']['name']]
+sheet_key_account = doc[config['source']['sheet']['keyAccount']['name']]
 
-partner_list = []
+data_partner = PartnerData(config)
+data_key_account = KeyAccountData()
 
-# Load partner data
-headers_partner_sheet = {cell.value.strip(): i for i, cell in enumerate(sheet_partner[1])}
-
-for partner in sheet_partner.iter_rows(2):
-    # Fixed data columns (0 to 10)
-    row_data = [partner[i].value for i in range(11)]
-
-    # Append boolean values for vertical columns dynamically
-    for vertical in config['vertical']:
-        row_data.append(
-            bool(partner[headers_partner_sheet[vertical]].value)
-        )
-
-    partner_list.append(tuple(row_data))
-
-# Dynamically set extra columns
-columns_partner = [
-    'area', 'country', 'sales_org',
-    'id', 'name', 'tier', 'profile',
-    'location', 'lat', 'long',
-    'revenue'
-]
-
-for vertical in config['vertical']:
-    columns_partner.append(vertical)
-
-# Convert to Pandas DataFrame
-df_partner = pd.DataFrame(partner_list, columns=columns_partner)
+data_partner.load(sheet_partner)
+data_key_account.load(sheet_key_account)
 
 
 ###############
 ### Sidebar ###
 ###############
 
-# Add filters
+# Filters
 st.sidebar.header('Filters')
 
 selected_country = st.sidebar.selectbox(
@@ -106,6 +80,13 @@ column_ratio_options = [
     {'name': '3:7', 'value': [3, 7]}
 ]
 
+# Heatmap & Region
+st.sidebar.header('Heatmap & Region')
+selected_heatmap_vertical = st.sidebar.selectbox(
+    'Vertical',
+    options=['All'] + config['vertical']
+)
+
 # View
 st.sidebar.header('View')
 
@@ -124,7 +105,7 @@ selected_column_ratio = st.sidebar.selectbox(
 geojson, is_level_1 = gd.get_geojson(selected_country['code'])
 
 ### Shallow copy DataFrames
-df_filtered_partner = df_partner.copy()
+df_filtered_partner = data_partner.df.copy()
 
 ### Filter country
 if geojson is not None and not geojson.empty:
@@ -190,7 +171,9 @@ with col1:
         if pd.notnull(row['lat']) and pd.notnull(row['long']):
             folium.Marker(
                 location=[row['lat'], row['long']],
-                tooltip=f'<b>Partner:</b> {row['name']} ({row['id']})<br>Revenue: {row['revenue']:,.2f} {config['data']['currency']}',
+                tooltip=f'''<b>Partner:</b> {row['name']} ({row['id']})<br>
+                            Actual Revenue: {row['actual_revenue']:,.2f} {config['data']['currency']}<br>
+                            Projected Revenue: {row['projected_revenue']:,.2f} {config['data']['currency']}''',
                 icon=folium.Icon(color=tier_color_map.get(row['tier'], 'blue'), icon='briefcase', prefix='fa')
             ).add_to(m)
 
