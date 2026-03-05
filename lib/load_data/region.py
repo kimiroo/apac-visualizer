@@ -53,7 +53,7 @@ class RegionData:
         ### Add data
         region_list = []
 
-        for region in sheet.iter_rows(2):
+        for region in sheet.iter_rows(3):
             # Fixed data columns
             row_data = [region[i].value for i in range(2)]
 
@@ -66,7 +66,7 @@ class RegionData:
             region_list.append(tuple(row_data))
 
         ### Dynamically set columns
-        columns_region = ['Country', 'Region']
+        columns_region = ['country', 'region']
 
         for vertical in self._config['vertical'] + optional_headers:
             columns = [

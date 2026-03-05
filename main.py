@@ -77,21 +77,37 @@ selected_tiers = st.sidebar.multiselect(
     default=[t['name'] for t in config['tiers']]
 )
 
+# Heatmap & Region
+st.sidebar.header('Heatmap & Region')
+
+selected_heatmap_vertical = st.sidebar.selectbox(
+    'Vertical',
+    options=['Total'] + config['vertical'] + ['Others']
+)
+
+heatmap_value_options = [
+    {'name': 'Total Market Value', 'value': 'total_market_value'},
+    {'name': 'Potential Market Value', 'value': 'potential_market_value'},
+    {'name': 'Actual Dealer Revenue', 'value': 'actual_dealer_revenue'},
+    {'name': 'Projected Dealer Revenue', 'value': 'projected_dealer_revenue'},
+    {'name': 'Dealer Count', 'value': 'dealer_cnt'},
+    {'name': 'Plant Count', 'value': 'plant_cnt'}
+]
+
+selected_heatmap_value = st.sidebar.selectbox(
+    'Value',
+    options=heatmap_value_options,
+    format_func=lambda x: x['name']
+)
+
+# View
+st.sidebar.header('View')
+
 column_ratio_options = [
     {'name': '7:3', 'value': [7, 3]},
     {'name': '5:5', 'value': [5, 5]},
     {'name': '3:7', 'value': [3, 7]}
 ]
-
-# Heatmap & Region
-st.sidebar.header('Heatmap & Region')
-selected_heatmap_vertical = st.sidebar.selectbox(
-    'Vertical',
-    options=['All'] + config['vertical']
-)
-
-# View
-st.sidebar.header('View')
 
 selected_column_ratio = st.sidebar.selectbox(
     'Split Ratio',
@@ -147,21 +163,29 @@ df_filtered_dealer = df_filtered_dealer[(df_filtered_dealer['tier'].isin(selecte
 col1, col2 = st.columns(selected_column_ratio['value'])
 
 with col1:
-    # 2. Initialize Folium Map
+    # Initialize Folium Map
     m = folium.Map(location=[15, 110], zoom_start=4, tiles='CartoDB positron')
 
     if geojson is not None and not geojson.empty:
-        folium.GeoJson(
-            data=geojson.to_json(),
-            style_function=lambda x: {
-                'fillColor': '#ebf0f7',
-                'color': '#3186cc',
-                'weight': 1,
-                'fillOpacity': 0.5
-            },
-            tooltip=folium.GeoJsonTooltip(fields=['NAME_1' if is_level_1 else 'GID_0'], aliases=['Region:'])
+
+        # Draw heatmap
+        choropleth = folium.Choropleth(
+            geo_data=geojson.to_json(),
+            data=data_region.df,
+            columns=['region', f'{selected_heatmap_vertical}_{selected_heatmap_value["value"]}'],
+            key_on='feature.properties.NAME_1' if is_level_1 else 'feature.properties.GID_0',
+            fill_color='YlOrRd', # Yellow-Orange-Red
+            fill_opacity=0.6,
+            line_opacity=0.2,
+            legend_name='Total Revenue by Region',
+            highlight=True # Hover effect
         ).add_to(m)
 
+        choropleth.geojson.add_child(
+            folium.GeoJsonTooltip(fields=['NAME_1' if is_level_1 else 'GID_0'], aliases=['Region:'])
+        )
+
+        # Center map to fit region
         bounds = geojson.total_bounds
         sw = [bounds[1], bounds[0]] # South-West (South, West)
         ne = [bounds[3], bounds[2]] # North-East (North, East)
@@ -180,7 +204,7 @@ with col1:
                 icon=folium.Icon(color=tier_color_map.get(row['tier'], 'blue'), icon='briefcase', prefix='fa')
             ).add_to(m)
 
-    # 4. Display Map and Capture User Interaction
+    # Display Map and Capture User Interaction
     map_data = st_folium(m, width='100%', height=1000)
 
 with col2:
