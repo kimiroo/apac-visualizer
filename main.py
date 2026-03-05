@@ -9,6 +9,7 @@ from lib.click_parser import parse_click
 from lib.geodata import GeoData, filter_by_geometry
 from lib.load_data.key_account import KeyAccountData
 from lib.load_data.dealer import DealerData
+from lib.load_data.region import RegionData
 
 ##############
 ### Config ###
@@ -37,16 +38,18 @@ st.title(config['app']['title'])
 gd = GeoData()
 
 # Load Excel data
-doc = xl.open(config['source']['filename'])
+doc = xl.load_workbook(config['source']['filename'], data_only=True, read_only=True)
 sheet_region = doc[config['source']['sheet']['region']['name']]
 sheet_dealer = doc[config['source']['sheet']['dealer']['name']]
 sheet_key_account = doc[config['source']['sheet']['keyAccount']['name']]
 
 data_dealer = DealerData(config)
 data_key_account = KeyAccountData()
+data_region = RegionData(config)
 
 data_dealer.load(sheet_dealer)
 data_key_account.load(sheet_key_account)
+data_region.load(sheet_region)
 
 
 ###############

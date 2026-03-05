@@ -13,7 +13,7 @@ class DealerData:
         partner_list = []
 
         # Load partner data
-        headers = {cell.value.strip(): i for i, cell in enumerate(sheet[1])}
+        headers = {cell.value: i for i, cell in enumerate(sheet[1])}
 
         for partner in sheet.iter_rows(2):
             # Fixed data columns
