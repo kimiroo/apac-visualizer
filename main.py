@@ -48,7 +48,7 @@ partner_list = []
 # Load partner data
 headers_partner_sheet = {cell.value.strip(): i for i, cell in enumerate(sheet_partner[1])}
 
-for partner in sheet_partner.iter_rows(config['source']['sheet']['partner']['rowStart']):
+for partner in sheet_partner.iter_rows(2):
     # Fixed data columns (0 to 10)
     row_data = [partner[i].value for i in range(11)]
 

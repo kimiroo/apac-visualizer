@@ -6,15 +6,12 @@ source:
   sheet:
     region:
       name: Region Vertical Overview
-      rowStart: 3
       addOther: True
       addTotal: True
     partner:
       name: Partner List
-      rowStart: 2
     keyAccount:
       name: Key Account List
-      rowStart: 2
 data:
   currency: USD
 vertical:
