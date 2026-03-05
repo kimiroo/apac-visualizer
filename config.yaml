@@ -4,8 +4,8 @@ app:
 source:
   filename: 'Dataset.xlsx'
   sheet:
-    location:
-      name: Area Vertical Overview
+    region:
+      name: Region Vertical Overview
       rowStart: 3
       addOther: True
       addTotal: True

@@ -40,7 +40,7 @@ gd = GeoData()
 
 # Load Excel data
 doc = xl.open(config['source']['filename'])
-sheet_location = doc[config['source']['sheet']['location']['name']]
+sheet_region = doc[config['source']['sheet']['region']['name']]
 sheet_partner = doc[config['source']['sheet']['partner']['name']]
 
 partner_list = []
