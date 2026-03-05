@@ -14,5 +14,14 @@ if not exist "%~dp0.venv\Scripts\activate.bat" (
 :: activate venv
 call "%~dp0.venv\Scripts\activate.bat"
 
+:: Check dependency
+python "%~dp0check_dependency.py" >nul 2>&1
+
+:: Install dependency if not installed
+if ERRORLEVEL 1 (
+    echo Installing dependency...
+    pip install -r "%~dp0requirements.txt"
+)
+
 :: Launch Streamlit
 streamlit run "%~dp0main.py"
