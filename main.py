@@ -9,6 +9,7 @@ import pandas as pd
 import openpyxl as xl
 import geopandas as gpd
 
+from lib.click_parser import parse_click
 from lib.geodata import GeoData, filter_by_geometry
 
 ##############
@@ -39,36 +40,25 @@ gd = GeoData()
 
 # Load Excel data
 doc = xl.open(config['source']['filename'])
-sheet_partner = doc[config['source']['sheetName']['partner']]
-sheet_plant = doc[config['source']['sheetName']['plant']]
+sheet_location = doc[config['source']['sheet']['location']['name']]
+sheet_partner = doc[config['source']['sheet']['partner']['name']]
 
 partner_list = []
-plant_list = []
 
 # Load partner data
 headers_partner_sheet = {cell.value.strip(): i for i, cell in enumerate(sheet_partner[1])}
 
-for partner in sheet_partner.iter_rows(2):
+for partner in sheet_partner.iter_rows(config['source']['sheet']['partner']['rowStart']):
     # Fixed data columns (0 to 10)
     row_data = [partner[i].value for i in range(11)]
 
-    # Append boolean values for industry columns dynamically
-    for industry in config['industries']:
+    # Append boolean values for vertical columns dynamically
+    for vertical in config['vertical']:
         row_data.append(
-            bool(partner[headers_partner_sheet[industry]].value)
+            bool(partner[headers_partner_sheet[vertical]].value)
         )
 
     partner_list.append(tuple(row_data))
-
-# Load plant data
-for plant in sheet_plant.iter_rows(2):
-    plant_list.append((
-        plant[3].value, # Lat
-        plant[4].value, # Long
-        plant[0].value, # Location
-        plant[1].value, # Vertical
-        plant[2].value  # Plant ID/Name
-    ))
 
 # Dynamically set extra columns
 columns_partner = [
@@ -78,12 +68,11 @@ columns_partner = [
     'revenue'
 ]
 
-for industry in config['industries']:
-    columns_partner.append(industry)
+for vertical in config['vertical']:
+    columns_partner.append(vertical)
 
 # Convert to Pandas DataFrame
 df_partner = pd.DataFrame(partner_list, columns=columns_partner)
-df_plant = pd.DataFrame(plant_list, columns=['lat', 'long', 'location', 'vertical', 'id_name'])
 
 
 ###############
@@ -99,20 +88,17 @@ selected_country = st.sidebar.selectbox(
     format_func=lambda x: x['name']
 )
 
-selected_industries = st.sidebar.multiselect(
-    'Industry Type',
-    options=config['industries'] + ['None'],
-    default=config['industries'] + ['None']
+selected_verticals = st.sidebar.multiselect(
+    'Vertical',
+    options=config['vertical'] + ['None'],
+    default=config['vertical'] + ['None']
 )
 
 selected_tiers = st.sidebar.multiselect(
-    'Tier (Partner only)',
+    'Tier',
     options=[t['name'] for t in config['tiers']],
     default=[t['name'] for t in config['tiers']]
 )
-
-show_partner = st.sidebar.checkbox('Partner', value=True)
-show_plant = st.sidebar.checkbox('Plant', value=True)
 
 column_ratio_options = [
     {'name': '7:3', 'value': [7, 3]},
@@ -139,47 +125,34 @@ geojson, is_level_1 = gd.get_geojson(selected_country['code'])
 
 ### Shallow copy DataFrames
 df_filtered_partner = df_partner.copy()
-df_filtered_plant = df_plant.copy()
 
 ### Filter country
 if geojson is not None and not geojson.empty:
     df_filtered_partner = filter_by_geometry(df_filtered_partner, geojson)
-    df_filtered_plant = filter_by_geometry(df_plant, geojson)
 
-### Filter industry
-actual_industries = [i for i in selected_industries if i != 'None']
-include_none = 'None' in selected_industries
+### Filter vertical
+actual_verticals = [i for i in selected_verticals if i != 'None']
+include_none = 'None' in selected_verticals
 
-# Mask for rows where at least one selected industry is True
-if actual_industries:
-    industry_mask = df_filtered_partner[actual_industries].any(axis=1)
+# Mask for rows where at least one selected vertical is True
+if actual_verticals:
+    vertical_mask = df_filtered_partner[actual_verticals].any(axis=1)
 else:
-    industry_mask = pd.Series(False, index=df_filtered_partner.index)
+    vertical_mask = pd.Series(False, index=df_filtered_partner.index)
 
-# Mask for rows where ALL industry columns are False (None case)
+# Mask for rows where ALL vertical columns are False (None case)
 if include_none:
-    all_industries = config['industries']
-    none_mask = ~df_filtered_partner[all_industries].any(axis=1)
-    is_in_selected_industries = industry_mask | none_mask
+    all_verticals = config['vertical']
+    none_mask = ~df_filtered_partner[all_verticals].any(axis=1)
+    is_in_selected_verticals = vertical_mask | none_mask
 else:
-    is_in_selected_industries = industry_mask
+    is_in_selected_verticals = vertical_mask
 
 # Final filtering
-df_filtered_partner = df_filtered_partner[is_in_selected_industries]
-df_filtered_plant = df_filtered_plant[
-    (df_filtered_plant['vertical'].isin(actual_industries)) |
-    (include_none & df_filtered_plant['vertical'].isna())
-]
+df_filtered_partner = df_filtered_partner[is_in_selected_verticals]
 
 ### Filter tier
 df_filtered_partner = df_filtered_partner[(df_filtered_partner['tier'].isin(selected_tiers))]
-
-### Checkbox
-if not show_partner:
-    df_filtered_partner = df_filtered_partner.iloc[0:0]
-
-if not show_plant:
-    df_filtered_plant = df_filtered_plant.iloc[0:0]
 
 
 ##############
@@ -211,16 +184,6 @@ with col1:
 
         m.fit_bounds([sw, ne])
 
-    # Draw plant pins
-    for _, row in df_filtered_plant.iterrows():
-        # Check for NaN coordinates to avoid errors
-        if pd.notnull(row['lat']) and pd.notnull(row['long']):
-            folium.Marker(
-                location=[row['lat'], row['long']],
-                tooltip=f'<b>Plant:</b> {row['id_name']}',
-                icon=folium.Icon(color='pink', icon='industry', prefix='fa')
-            ).add_to(m)
-
     # Draw partner pins
     for _, row in df_filtered_partner.iterrows():
         # Check for NaN coordinates to avoid errors
@@ -239,37 +202,11 @@ with col2:
     # Check if a user clicked a region or a point
     if map_data.get('last_object_clicked'):
 
-        filter_click_type = r'^(?:\s*)(Region|Partner|Plant):'
-
         last_tooltip = map_data.get('last_object_clicked_tooltip')
-        found = re.findall(filter_click_type, last_tooltip)
 
-        _tmp_data = None
+        obj_type, obj_name = parse_click(last_tooltip)
 
-        if found:
-            filter_region = r'(?:\s+)(.+)'
-            filter_partner = r'^Partner: .* \((.*)\)Revenue:'
-            filter_plant = r'^Plant: (.*)$'
-
-            if found[0] == 'Region':
-                found_region = [res.strip() for res in re.findall(filter_region, last_tooltip) if res.strip()]
-                region = found_region[-1]
-
-                _tmp_data = region
-
-            elif found[0] == 'Partner':
-                found_id = re.findall(filter_partner, last_tooltip)
-                partner_id = found_id[0]
-
-                _tmp_data = partner_id
-
-            elif found[0] == 'Plant':
-                found_name = re.findall(filter_plant, last_tooltip)
-                plant_name = found_name[0]
-
-                _tmp_data = plant_name
-
-        st.write(f'You clicked on: {_tmp_data}')
+        st.write(f'You clicked on: {obj_name} ({obj_type})')
         # You can filter your Pandas DataFrame here and show charts
     else:
         st.info('Click a region or a pin on the map to see details.')

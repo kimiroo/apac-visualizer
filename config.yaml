@@ -3,12 +3,21 @@ app:
   favicon: assets/plana.png
 source:
   filename: 'Dataset.xlsx'
-  sheetName:
-    partner: Partner List
-    plant: Plant List
+  sheet:
+    location:
+      name: Area Vertical Overview
+      rowStart: 3
+      addOther: True
+      addTotal: True
+    partner:
+      name: Partner List
+      rowStart: 2
+    keyAccount:
+      name: Key Account List
+      rowStart: 2
 data:
   currency: USD
-industries:
+vertical:
   - F&B
   - Heavy Industry
   - Chemical/Pharma
