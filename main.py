@@ -1,3 +1,4 @@
+import re
 import json
 
 import yaml
@@ -222,14 +223,12 @@ with col1:
 
     # Draw partner pins
     for _, row in df_filtered_partner.iterrows():
-        pin_color = tier_color_map.get(row['tier'], 'blue')
-
         # Check for NaN coordinates to avoid errors
         if pd.notnull(row['lat']) and pd.notnull(row['long']):
             folium.Marker(
                 location=[row['lat'], row['long']],
                 tooltip=f'<b>Partner:</b> {row['name']} ({row['id']})<br>Revenue: {row['revenue']:,.2f} {config['data']['currency']}',
-                icon=folium.Icon(color=pin_color, icon='briefcase', prefix='fa')
+                icon=folium.Icon(color=tier_color_map.get(row['tier'], 'blue'), icon='briefcase', prefix='fa')
             ).add_to(m)
 
     # 4. Display Map and Capture User Interaction
@@ -239,8 +238,38 @@ with col2:
     st.subheader('Selected Details')
     # Check if a user clicked a region or a point
     if map_data.get('last_object_clicked'):
-        clicked_info = map_data['last_object_clicked']
-        st.write(f'You clicked on: {clicked_info}')
+
+        filter_click_type = r'^(?:\s*)(Region|Partner|Plant):'
+
+        last_tooltip = map_data.get('last_object_clicked_tooltip')
+        found = re.findall(filter_click_type, last_tooltip)
+
+        _tmp_data = None
+
+        if found:
+            filter_region = r'(?:\s+)(.+)'
+            filter_partner = r'^Partner: .* \((.*)\)Revenue:'
+            filter_plant = r'^Plant: (.*)$'
+
+            if found[0] == 'Region':
+                found_region = [res.strip() for res in re.findall(filter_region, last_tooltip) if res.strip()]
+                region = found_region[-1]
+
+                _tmp_data = region
+
+            elif found[0] == 'Partner':
+                found_id = re.findall(filter_partner, last_tooltip)
+                partner_id = found_id[0]
+
+                _tmp_data = partner_id
+
+            elif found[0] == 'Plant':
+                found_name = re.findall(filter_plant, last_tooltip)
+                plant_name = found_name[0]
+
+                _tmp_data = plant_name
+
+        st.write(f'You clicked on: {_tmp_data}')
         # You can filter your Pandas DataFrame here and show charts
     else:
         st.info('Click a region or a pin on the map to see details.')
