@@ -94,7 +94,7 @@ selected_heatmap_vertical = st.sidebar.selectbox(
     options=['Total'] + config['vertical'] + ['Others']
 )
 
-st.sidebar.caption("💡 Tip: 'Vertical' filter also applies to the right info panel.")
+st.sidebar.caption("💡 Tip: 'Vertical' filter also applies to the Dealer list in the right info panel.")
 
 heatmap_value_options = [
     {'name': 'Total Market Value', 'value': 'total_market_value'},
