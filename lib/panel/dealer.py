@@ -45,7 +45,7 @@ class DealerPanel:
         chart = alt.Chart(performance_df).mark_bar().encode(
             x=alt.X('Revenue:N', title='Revenue'),
             y=alt.Y('Value:Q', title='Value', axis=alt.Axis(format='$,.2f')),
-            color=alt.Color('Revenue:N', scale=alt.Scale(range=['#1F77B4', '#D3D3D3'])),
+            color=alt.Color('Revenue:N', scale=alt.Scale(range=['#1F77B4', '#B8B8B8'])),
             tooltip=alt.Tooltip(format='$,.2f')
         )
 
