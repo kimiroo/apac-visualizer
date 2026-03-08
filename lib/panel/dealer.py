@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import altair as alt
 
 class DealerPanel:
     def __init__(self, df_dealer: pd.DataFrame, config: dict):
@@ -18,21 +19,19 @@ class DealerPanel:
 
         st.subheader(f'🤝 Dealer: {row['name']}')
 
-        revenue_header = f'Revenue'
-
         performance_df = pd.DataFrame({
-            'Category': ['Projected', 'Actual'],
-            revenue_header: [row['projected_revenue'], row['actual_revenue']]
+            'Revenue': ['Projected', 'Actual'],
+            'Value': [row['projected_revenue'], row['actual_revenue']]
         })
 
-        st.bar_chart(
-            data=performance_df,
-            x='Category',
-            y=revenue_header,
-            color='Category' # Different color for projected and actual revenue
+        chart = alt.Chart(performance_df).mark_bar().encode(
+            x=alt.X('Revenue:N', title='Revenue'),
+            y=alt.Y('Value:Q', title='Value', axis=alt.Axis(format='$,.2f')),
+            color=alt.Color('Revenue:N', scale=alt.Scale(range=['#1F77B4', '#D3D3D3'])),
+            tooltip=alt.Tooltip(format='$,.2f')
         )
 
-        st.divider()
+        st.altair_chart(chart, width='stretch')
 
         st.write('##### 📝 Dealer Information')
 
