@@ -174,7 +174,7 @@ class RegionPanel:
         ### Key Accounts
         st.write(f'##### ❤️ Key Account')
 
-        key_account = self._df_k[(self._df_d['country'] == str(country)) & (self._df_k['region'] == str(region))]
+        key_account = self._df_k[(self._df_k['country'] == str(country)) & (self._df_k['region'] == str(region))]
         key_account = key_account[['name', 'vertical']].copy()
 
         key_account.columns = ['Name', 'Vertical']
