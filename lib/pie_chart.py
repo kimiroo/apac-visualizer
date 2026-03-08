@@ -3,7 +3,7 @@
 import pandas as pd
 import altair as alt
 
-def pie_chart_with_percentage(df: pd.DataFrame, format_string):
+def pie_chart_with_percentage(df: pd.DataFrame, format_string: str) -> alt.Chart | None:
     """Generates a pie chart with percentage labels.
 
     Args:

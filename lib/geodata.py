@@ -4,6 +4,7 @@ import os
 from pathlib import Path
 
 import pycountry
+import pandas as pd
 import geopandas as gpd
 from shapely.geometry import Point
 
@@ -12,7 +13,7 @@ GEODATA_PATH = Path('geodata/original')
 class GeoData:
     """Manages loading and retrieving of country and region geospatial data."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initializes the GeoData instance by loading available country codes."""
         # Load country list
         country_codes = [f.stem.split('_')[0] for f in GEODATA_PATH.glob("*.json") if f.is_file()]
@@ -31,7 +32,7 @@ class GeoData:
         # All 'All' option
         self.country_list = [{'name': 'All', 'code': None}] + self.country_list
 
-    def get_geojson(self, code):
+    def get_geojson(self, code: str) -> tuple[gpd.GeoDataFrame | None, bool]:
         """Retrieves the GeoJSON data for a specific country code.
 
         Args:
@@ -56,7 +57,7 @@ class GeoData:
 
         return None, False
 
-    def get_name(self, code):
+    def get_name(self, code: str) -> str | None:
             """Returns the best display name for a given ISO Alpha-3 code.
 
             Args:
@@ -74,7 +75,7 @@ class GeoData:
             except Exception:
                 return None
 
-def filter_by_geometry(dataframe, country_gdf, region = None):
+def filter_by_geometry(dataframe: pd.DataFrame, country_gdf: gpd.GeoDataFrame, region: str | None = None) -> gpd.GeoDataFrame:
     """Filters a DataFrame of points by a geographic boundary.
 
     Args:

@@ -7,7 +7,7 @@ filter_click_type = r'^(?:\s*)(Region|Dealer):'
 filter_region = r'(?:\s+)(.+)'
 filter_dealer = r'^Dealer: .* \((.*)\)'
 
-def parse_click(tooltip_string):
+def parse_click(tooltip_string: str) -> tuple[str | None, str | None]:
     """Parses the tooltip string to identify the clicked object type and name.
 
     Args:

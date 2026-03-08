@@ -9,11 +9,11 @@ if TYPE_CHECKING:
 class KeyAccountData:
     """Manages the loading and structuring of key account information."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initializes the KeyAccountData instance."""
         self.df: pd.DataFrame = None
 
-    def load(self, sheet: _WorksheetOrChartsheetLike):
+    def load(self, sheet: "_WorksheetOrChartsheetLike") -> None:
         """Loads key account data from an Excel worksheet.
 
         Args:

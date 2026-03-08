@@ -9,7 +9,7 @@ if TYPE_CHECKING:
 class DealerData:
     """Manages the loading and structuring of dealer information."""
 
-    def __init__(self, config):
+    def __init__(self, config: dict) -> None:
         """Initializes the DealerData instance.
 
         Args:
@@ -18,7 +18,7 @@ class DealerData:
         self.df: pd.DataFrame = None
         self._config = config
 
-    def load(self, sheet: _WorksheetOrChartsheetLike):
+    def load(self, sheet: "_WorksheetOrChartsheetLike") -> None:
         """Loads dealer data from an Excel worksheet.
 
         Args:

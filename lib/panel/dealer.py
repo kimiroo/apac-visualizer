@@ -9,7 +9,7 @@ from lib.get_active_verticals import GetActiveVerticalString
 class DealerPanel:
     """Handles the rendering of the dealer details panel in the Streamlit app."""
 
-    def __init__(self, df_dealer: pd.DataFrame, config: dict):
+    def __init__(self, df_dealer: pd.DataFrame, config: dict) -> None:
         """Initializes the DealerPanel.
 
         Args:
@@ -20,7 +20,7 @@ class DealerPanel:
         self._config: dict = config
         self._active_vertical = GetActiveVerticalString(self._config)
 
-    def draw(self, dealer_id: str):
+    def draw(self, dealer_id: str) -> None:
         """Renders the dealer information panel for a specific dealer ID.
 
         Args:

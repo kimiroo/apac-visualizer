@@ -9,7 +9,7 @@ if TYPE_CHECKING:
 class RegionData:
     """Manages the loading and structuring of regional market data."""
 
-    def __init__(self, config):
+    def __init__(self, config: dict) -> None:
         """Initializes the RegionData instance.
 
         Args:
@@ -18,7 +18,7 @@ class RegionData:
         self.df: pd.DataFrame = None
         self._config = config
 
-    def load(self, sheet: _WorksheetOrChartsheetLike):
+    def load(self, sheet: "_WorksheetOrChartsheetLike") -> None:
         """Loads region data from an Excel worksheet, parsing dynamic vertical columns.
 
         Args:

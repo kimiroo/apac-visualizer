@@ -7,7 +7,7 @@ from bs4 import BeautifulSoup
 import geopandas as gpd
 
 
-def optimize_gadm_data(input_path, output_path, tolerance=0.01):
+def optimize_gadm_data(input_path: str, output_path: str, tolerance: float = 0.01) -> None:
     """Optimizes GADM geospatial data by simplifying geometry.
 
     Args:

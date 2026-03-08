@@ -1,6 +1,6 @@
 """Module for calculating number divisors and units."""
 
-def get_divisor(value):
+def get_divisor(value: float) -> tuple[int, str]:
     """Determines the divisor and unit suffix for large numbers.
 
     Args:

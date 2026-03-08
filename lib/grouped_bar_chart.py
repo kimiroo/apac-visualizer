@@ -1,8 +1,9 @@
 """Module for generating grouped bar charts using Altair."""
 
+import pandas as pd
 import altair as alt
 
-def grouped_bar_chart(df, x_config, y_config, format_string):
+def grouped_bar_chart(df: pd.DataFrame, x_config: tuple[str, str], y_config: tuple[str, str], format_string: str) -> alt.Chart:
     """Generates a grouped bar chart.
 
     Args:

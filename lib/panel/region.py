@@ -11,7 +11,7 @@ from lib.pie_chart import pie_chart_with_percentage
 class RegionPanel:
     """Handles the rendering of the region details panel in the Streamlit app."""
 
-    def __init__(self, df_dealer: pd.DataFrame, df_key_account: pd.DataFrame, config: dict):
+    def __init__(self, df_dealer: pd.DataFrame, df_key_account: pd.DataFrame, config: dict) -> None:
         """Initializes the RegionPanel.
 
         Args:
@@ -24,7 +24,7 @@ class RegionPanel:
         self._config: dict = config
         self._active_vertical = GetActiveVerticalString(self._config)
 
-    def draw(self, country: str, region: str, selected_vertical, df_filtered_dealers: pd.DataFrame = None):
+    def draw(self, country: str, region: str, selected_vertical: str, df_filtered_dealers: pd.DataFrame | None = None) -> None:
         """Renders the region information panel.
 
         Args:

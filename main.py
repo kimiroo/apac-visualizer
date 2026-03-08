@@ -51,7 +51,7 @@ st.title(config['app']['title'])
 
 # Load geodata
 @st.cache_resource
-def load_geodata():
+def load_geodata() -> GeoData:
     """Loads and caches the GeoData instance.
 
     Returns:
@@ -63,7 +63,7 @@ gd = load_geodata()
 
 # Load Excel data
 @st.cache_resource
-def load_excel(filename):
+def load_excel(filename: str) -> xl.Workbook:
     """Loads an Excel workbook.
 
     Args:
