@@ -1,3 +1,5 @@
+"""Script to download and optimize GADM geospatial data."""
+
 import os
 
 import requests
@@ -6,11 +8,13 @@ import geopandas as gpd
 
 
 def optimize_gadm_data(input_path, output_path, tolerance=0.01):
-    """
-    input_path: Original GADM file (GeoJSON, GPKG, etc.)
-    output_path: Path to save the optimized file (GeoJSON recommended)
-    tolerance: Degree of simplification (Recommended: 0.01~0.05.
-               Higher values reduce file size but make boundaries smoother/blockier.)
+    """Optimizes GADM geospatial data by simplifying geometry.
+
+    Args:
+        input_path (str): Path to the original GADM file (GeoJSON, GPKG, etc.).
+        output_path (str): Path to save the optimized file (GeoJSON recommended).
+        tolerance (float, optional): Degree of simplification. Higher values reduce file size
+            but make boundaries smoother/blockier. Defaults to 0.01.
     """
     # 1. Load Data
     # Use pyogrio engine for faster reading if installed

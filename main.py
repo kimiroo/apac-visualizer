@@ -1,3 +1,10 @@
+"""Main entry point for the APAC Visualizer Streamlit application.
+
+This script initializes the Streamlit app, loads configuration and data,
+sets up the sidebar filters, and renders the interactive map and
+information panels.
+"""
+
 import yaml
 import streamlit as st
 import folium
@@ -45,6 +52,11 @@ st.title(config['app']['title'])
 # Load geodata
 @st.cache_resource
 def load_geodata():
+    """Loads and caches the GeoData instance.
+
+    Returns:
+        GeoData: An instance of the GeoData class containing geographic information.
+    """
     return GeoData()
 
 gd = load_geodata()
@@ -52,6 +64,14 @@ gd = load_geodata()
 # Load Excel data
 @st.cache_resource
 def load_excel(filename):
+    """Loads an Excel workbook.
+
+    Args:
+        filename (str): The path to the Excel file.
+
+    Returns:
+        xl.Workbook: The loaded Excel workbook object in read-only and data-only mode.
+    """
     return xl.load_workbook(filename, data_only=True, read_only=True)
 
 doc = load_excel(config['source']['filename'])

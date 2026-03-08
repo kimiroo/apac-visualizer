@@ -1,4 +1,16 @@
+"""Module for calculating number divisors and units."""
+
 def get_divisor(value):
+    """Determines the divisor and unit suffix for large numbers.
+
+    Args:
+        value (float): The numeric value to format.
+
+    Returns:
+        tuple: A tuple containing (divisor, unit).
+            divisor (int): The divisor to scale the value (1, 1000, 1M, 1B).
+            unit (str): The unit suffix ('', 'K', 'M', 'B').
+    """
     divisor = 1
     unit = ''
 

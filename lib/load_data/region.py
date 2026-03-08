@@ -1,3 +1,5 @@
+"""Module for loading and processing region data from Excel sheets."""
+
 from typing import TYPE_CHECKING
 import pandas as pd
 
@@ -5,11 +7,23 @@ if TYPE_CHECKING:
     from openpyxl.workbook.workbook import _WorksheetOrChartsheetLike
 
 class RegionData:
+    """Manages the loading and structuring of regional market data."""
+
     def __init__(self, config):
+        """Initializes the RegionData instance.
+
+        Args:
+            config (dict): Application configuration containing vertical definitions.
+        """
         self.df: pd.DataFrame = None
         self._config = config
 
     def load(self, sheet: _WorksheetOrChartsheetLike):
+        """Loads region data from an Excel worksheet, parsing dynamic vertical columns.
+
+        Args:
+            sheet (_WorksheetOrChartsheetLike): The Excel worksheet containing region data.
+        """
 
         ### Parse header
         headers = {}

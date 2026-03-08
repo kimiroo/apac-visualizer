@@ -1,3 +1,9 @@
+"""Checks for required dependencies.
+
+Attempts to import all necessary libraries. Exits with status code 0 if
+successful, or 1 if any import fails.
+"""
+
 import sys
 
 try:

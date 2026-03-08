@@ -1,3 +1,5 @@
+"""Module for parsing click events from the Folium map."""
+
 import re
 
 filter_click_type = r'^(?:\s*)(Region|Dealer):'
@@ -6,8 +8,14 @@ filter_region = r'(?:\s+)(.+)'
 filter_dealer = r'^Dealer: .* \((.*)\)'
 
 def parse_click(tooltip_string):
-    """
-    Returns type, name(or ID)
+    """Parses the tooltip string to identify the clicked object type and name.
+
+    Args:
+        tooltip_string (str): The tooltip string returned by the map click event.
+
+    Returns:
+        tuple: A tuple containing (type, name_or_id).
+            Returns (None, None) if parsing fails.
     """
 
     found = re.findall(filter_click_type, tooltip_string)

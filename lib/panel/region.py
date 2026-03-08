@@ -1,3 +1,5 @@
+"""Module for rendering the Region Information Panel."""
+
 import streamlit as st
 import pandas as pd
 from millify import millify
@@ -7,13 +9,30 @@ from lib.grouped_bar_chart import grouped_bar_chart
 from lib.pie_chart import pie_chart_with_percentage
 
 class RegionPanel:
+    """Handles the rendering of the region details panel in the Streamlit app."""
+
     def __init__(self, df_dealer: pd.DataFrame, df_key_account: pd.DataFrame, config: dict):
+        """Initializes the RegionPanel.
+
+        Args:
+            df_dealer (pd.DataFrame): The dataframe containing dealer information.
+            df_key_account (pd.DataFrame): The dataframe containing key account information.
+            config (dict): Application configuration dictionary.
+        """
         self._df_d: pd.DataFrame = df_dealer
         self._df_k: pd.DataFrame = df_key_account
         self._config: dict = config
         self._active_vertical = GetActiveVerticalString(self._config)
 
     def draw(self, country: str, region: str, selected_vertical, df_filtered_dealers: pd.DataFrame = None):
+        """Renders the region information panel.
+
+        Args:
+            country (str): The name of the country.
+            region (str): The name of the region.
+            selected_vertical (str): The currently selected vertical filter.
+            df_filtered_dealers (pd.DataFrame, optional): Filtered dataframe of dealers. Defaults to None.
+        """
 
         ### Data Filtering
         data = self._df_d[(self._df_d['country'] == str(country)) & (self._df_d['region'] == str(region))]

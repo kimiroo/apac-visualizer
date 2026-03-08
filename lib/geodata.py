@@ -1,3 +1,5 @@
+"""Module for handling geographic data and operations."""
+
 import os
 from pathlib import Path
 
@@ -8,7 +10,10 @@ from shapely.geometry import Point
 GEODATA_PATH = Path('geodata/original')
 
 class GeoData:
+    """Manages loading and retrieving of country and region geospatial data."""
+
     def __init__(self):
+        """Initializes the GeoData instance by loading available country codes."""
         # Load country list
         country_codes = [f.stem.split('_')[0] for f in GEODATA_PATH.glob("*.json") if f.is_file()]
         country_dict = {}
@@ -27,6 +32,16 @@ class GeoData:
         self.country_list = [{'name': 'All', 'code': None}] + self.country_list
 
     def get_geojson(self, code):
+        """Retrieves the GeoJSON data for a specific country code.
+
+        Args:
+            code (str): The ISO Alpha-3 country code.
+
+        Returns:
+            tuple: A tuple containing (geojson, is_level_1).
+                geojson (gpd.GeoDataFrame): The GeoDataFrame for the country.
+                is_level_1 (bool): True if Level 1 (regions) data is returned, False otherwise.
+        """
         if code:
             is_level_1 = True
             file_path = GEODATA_PATH / f'{code}_1.json'
@@ -42,7 +57,14 @@ class GeoData:
         return None, False
 
     def get_name(self, code):
-            """Returns the best display name for a given ISO Alpha-3 code."""
+            """Returns the best display name for a given ISO Alpha-3 code.
+
+            Args:
+                code (str): The ISO Alpha-3 country code.
+
+            Returns:
+                str: The common name of the country, or None if not found.
+            """
             try:
                 country = pycountry.countries.get(alpha_3=code.upper())
                 if not country:
@@ -53,6 +75,16 @@ class GeoData:
                 return None
 
 def filter_by_geometry(dataframe, country_gdf, region = None):
+    """Filters a DataFrame of points by a geographic boundary.
+
+    Args:
+        dataframe (pd.DataFrame): The DataFrame containing 'lat' and 'long' columns.
+        country_gdf (gpd.GeoDataFrame): The GeoDataFrame defining the boundaries.
+        region (str, optional): The specific region name to filter by. Defaults to None.
+
+    Returns:
+        gpd.GeoDataFrame: The filtered GeoDataFrame containing points within the boundary.
+    """
     # Convert DataFrame to GeoDataFrame
     geometry = [Point(xy) for xy in zip(dataframe['long'], dataframe['lat'])]
     gdf = gpd.GeoDataFrame(dataframe, geometry=geometry, crs="EPSG:4326")

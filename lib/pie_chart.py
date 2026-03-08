@@ -1,7 +1,18 @@
+"""Module for generating pie charts using Altair."""
+
 import pandas as pd
 import altair as alt
 
 def pie_chart_with_percentage(df: pd.DataFrame, format_string):
+    """Generates a pie chart with percentage labels.
+
+    Args:
+        df (pd.DataFrame): The source dataframe containing 'Value' and 'Vertical' columns.
+        format_string (str): The format string for tooltips.
+
+    Returns:
+        alt.Chart: The generated Altair chart object, or None if total value is 0.
+    """
 
     # Calculate percentage and generate percentage string
     total_value = df['Value'].sum()
