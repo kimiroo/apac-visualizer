@@ -55,21 +55,24 @@ data_key_account.load(sheet_key_account)
 data_region.load(sheet_region)
 
 panel_dealer = DealerPanel(data_dealer.df, config)
-panel_region = RegionPanel(data_region.df, config)
+panel_region = RegionPanel(data_region.df, data_key_account.df, config)
 
 
 ###############
 ### Sidebar ###
 ###############
 
-# Filters
-st.sidebar.header('Filters')
+# Common
+st.sidebar.header('Common')
 
 selected_country = st.sidebar.selectbox(
     'Country',
     options=gd.country_list,
     format_func=lambda x: x['name']
 )
+
+# Dealer
+st.sidebar.header('Dealer')
 
 selected_verticals = st.sidebar.multiselect(
     'Vertical',
@@ -83,13 +86,15 @@ selected_tiers = st.sidebar.multiselect(
     default=[t['name'] for t in config['tiers']]
 )
 
-# Heatmap & Region
-st.sidebar.header('Heatmap & Region')
+# Heatmap
+st.sidebar.header('Heatmap')
 
 selected_heatmap_vertical = st.sidebar.selectbox(
     'Vertical',
     options=['Total'] + config['vertical'] + ['Others']
 )
+
+st.sidebar.caption("💡 Tip: 'Vertical' filter also applies to the right info panel.")
 
 heatmap_value_options = [
     {'name': 'Total Market Value', 'value': 'total_market_value'},
@@ -158,7 +163,7 @@ else:
 df_filtered_dealer = df_filtered_dealer[is_in_selected_verticals]
 
 ### Filter tier
-df_filtered_dealer = df_filtered_dealer[(df_filtered_dealer['tier'].isin(selected_tiers))]
+df_filtered_dealer = df_filtered_dealer[df_filtered_dealer['tier'].isin(selected_tiers)]
 
 
 ##############
@@ -224,7 +229,21 @@ with col2:
         if obj_type == 'dealer':
             panel_dealer.draw(obj_name)
         elif obj_type == 'region':
-            panel_region.draw(selected_country['name'], obj_name, selected_heatmap_vertical)
+            ### Filter for info panel
+            df_filtered_dealer_info_panel = data_dealer.df
+
+            # Vertical
+            if selected_heatmap_vertical != 'Total':
+                if selected_heatmap_vertical == 'Others':
+                    df_filtered_dealer_info_panel = data_dealer.df.iloc[0:0]
+                else:
+                    df_filtered_dealer_info_panel = data_dealer.df[data_dealer.df[selected_heatmap_vertical]]
+
+            # Country
+            df_filtered_dealer_info_panel = filter_by_geometry(df_filtered_dealer_info_panel, geojson, obj_name)
+
+            ### Draw
+            panel_region.draw(selected_country['name'], obj_name, selected_heatmap_vertical, df_filtered_dealer_info_panel)
 
     else:
         st.info('Click a region or a pin on the map to see details.')

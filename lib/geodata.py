@@ -52,12 +52,18 @@ class GeoData:
             except Exception:
                 return None
 
-def filter_by_geometry(dataframe, country_gdf):
+def filter_by_geometry(dataframe, country_gdf, region = None):
     # Convert DataFrame to GeoDataFrame
     geometry = [Point(xy) for xy in zip(dataframe['long'], dataframe['lat'])]
     gdf = gpd.GeoDataFrame(dataframe, geometry=geometry, crs="EPSG:4326")
 
+    if region:
+        # Filter the polygons first to get only the specific region
+        target_boundary = country_gdf[country_gdf['NAME_1'] == region]
+    else:
+        target_boundary = country_gdf
+
     # Spatial Join
-    filtered_by_geo = gpd.sjoin(gdf, country_gdf, predicate='within')
+    filtered_by_geo = gpd.sjoin(gdf, target_boundary, predicate='within')
 
     return filtered_by_geo

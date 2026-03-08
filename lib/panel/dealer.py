@@ -2,10 +2,13 @@ import streamlit as st
 import pandas as pd
 import altair as alt
 
+from lib.get_active_verticals import GetActiveVerticalString
+
 class DealerPanel:
     def __init__(self, df_dealer: pd.DataFrame, config: dict):
         self._df: pd.DataFrame = df_dealer
         self._config: dict = config
+        self._active_vertical = GetActiveVerticalString(self._config)
 
     def draw(self, dealer_id: str):
 
@@ -36,13 +39,12 @@ class DealerPanel:
         st.write('##### 📝 Dealer Information')
 
         # Extract active verticals (where value is True)
-        active_verticals = [v for v in self._config['vertical'] if row[v]]
-        vertical_display = ', '.join(active_verticals) if active_verticals else 'None'
+        active_vertical_string = self._active_vertical.get(row)
 
         # Create a clean summary table for the UI
         info_data = {
-            'Field': ['ID', 'Name', 'Tier', 'Verticals'],
-            'Value': [row['id'], row['name'], row['tier'], vertical_display]
+            'Key': ['ID', 'Name', 'Tier', 'Profile', 'Location', 'Verticals'],
+            'Value': [row['id'], row['name'], row['tier'], row['profile'], row['location'], active_vertical_string]
         }
 
         st.dataframe(
@@ -50,7 +52,7 @@ class DealerPanel:
             hide_index=True,
             on_select='ignore',
             column_config={
-                'Field': st.column_config.TextColumn('Key', width='small'),
+                'Key': st.column_config.TextColumn('Key', width='small'),
                 'Value': st.column_config.TextColumn('Value', width='large')
             }
         )
