@@ -4,8 +4,6 @@ import requests
 from bs4 import BeautifulSoup
 import geopandas as gpd
 
-resp = requests.get('https://gadm.org/download_country.html')
-soup = BeautifulSoup(resp.text, 'html.parser')
 
 def optimize_gadm_data(input_path, output_path, tolerance=0.01):
     """
@@ -42,26 +40,30 @@ def optimize_gadm_data(input_path, output_path, tolerance=0.01):
     print(f"Original Size: {os.path.getsize(input_path) / 1024 / 1024:.2f} MB")
     print(f"Optimized Size: {os.path.getsize(output_path) / 1024 / 1024:.2f} MB")
 
-for choice in soup.select('#countrySelect option'):
+if __name__ == "__main__":
+    resp = requests.get('https://gadm.org/download_country.html')
+    soup = BeautifulSoup(resp.text, 'html.parser')
 
-    if choice.get('value'):
-        value = choice.get('value').split('_')
+    for choice in soup.select('#countrySelect option'):
 
-        country_id = value[0]
-        map_level = int(value[-1])
+        if choice.get('value'):
+            value = choice.get('value').split('_')
 
-        level = 1 if map_level > 1 else 0
+            country_id = value[0]
+            map_level = int(value[-1])
 
-        os.makedirs('geodata/original', exist_ok=True)
-        os.makedirs('geodata/optimized', exist_ok=True)
+            level = 1 if map_level > 1 else 0
 
-        print(f'Downloading {country_id}...')
-        url = f'https://geodata.ucdavis.edu/gadm/gadm4.1/json/gadm41_{country_id}_{level}.json'
+            os.makedirs('geodata/original', exist_ok=True)
+            os.makedirs('geodata/optimized', exist_ok=True)
 
-        resp = requests.get(url)
+            print(f'Downloading {country_id}...')
+            url = f'https://geodata.ucdavis.edu/gadm/gadm4.1/json/gadm41_{country_id}_{level}.json'
 
-        with open(f'geodata/original/{country_id}_{level}.json', 'w') as f:
-            f.write(resp.text)
+            resp = requests.get(url)
 
-        #print(f'Optimizing {country_id}...')
-        #optimize_gadm_data(f'geodata/original/{country_id}_{level}.json', f'geodata/optimized/{country_id}_{level}.json', 0.02)
+            with open(f'geodata/original/{country_id}_{level}.json', 'w') as f:
+                f.write(resp.text)
+
+            #print(f'Optimizing {country_id}...')
+            #optimize_gadm_data(f'geodata/original/{country_id}_{level}.json', f'geodata/optimized/{country_id}_{level}.json', 0.02)
