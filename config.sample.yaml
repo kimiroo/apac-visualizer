@@ -10,8 +10,6 @@ source:
       name: Dealer List
     keyAccount:
       name: Key Account List
-data:
-  currency: USD # Remove
 vertical:
   - F&B
   - Heavy Industry
