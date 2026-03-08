@@ -1,6 +1,7 @@
 beautifulsoup4
 folium
 geopandas
+millify
 openpyxl
 osmnx
 pycountry

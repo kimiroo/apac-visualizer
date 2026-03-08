@@ -205,8 +205,8 @@ with col1:
             folium.Marker(
                 location=[row['lat'], row['long']],
                 tooltip=f'''<b>Dealer:</b> {row['name']} ({row['id']})<br>
-                            Actual Revenue: {row['actual_revenue']:,.2f} {config['data']['currency']}<br>
-                            Projected Revenue: {row['projected_revenue']:,.2f} {config['data']['currency']}''',
+                            Actual Revenue: ${row['actual_revenue']:,.2f}<br>
+                            Projected Revenue: ${row['projected_revenue']:,.2f}''',
                 icon=folium.Icon(color=tier_color_map.get(row['tier'], 'blue'), icon='briefcase', prefix='fa')
             ).add_to(m)
 
@@ -224,7 +224,7 @@ with col2:
         if obj_type == 'dealer':
             panel_dealer.draw(obj_name)
         elif obj_type == 'region':
-            panel_region.draw(selected_country['name'], obj_name)
+            panel_region.draw(selected_country['name'], obj_name, selected_heatmap_vertical)
 
     else:
         st.info('Click a region or a pin on the map to see details.')

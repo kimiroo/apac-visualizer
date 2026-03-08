@@ -18,7 +18,7 @@ class DealerPanel:
 
         st.subheader(f'🤝 Dealer: {row['name']}')
 
-        revenue_header = f'Revenue ({self._config['data']['currency']})'
+        revenue_header = f'Revenue'
 
         performance_df = pd.DataFrame({
             'Category': ['Projected', 'Actual'],

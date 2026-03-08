@@ -11,7 +11,7 @@ source:
     keyAccount:
       name: Key Account List
 data:
-  currency: USD
+  currency: USD # Remove
 vertical:
   - F&B
   - Heavy Industry

@@ -4,6 +4,7 @@ try:
     import bs4
     import folium
     import geopandas
+    import millify
     import openpyxl
     import osmnx
     import pycountry
