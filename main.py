@@ -14,6 +14,10 @@ from lib.load_data.region import RegionData
 from lib.panel.dealer import DealerPanel
 from lib.panel.region import RegionPanel
 
+# code by me
+# https://github.com/kimiroo/apac-visualizer
+# Author: kimiroo (Yongjun Kim)
+
 
 ##############
 ### Config ###
@@ -39,10 +43,18 @@ st.set_page_config(
 st.title(config['app']['title'])
 
 # Load geodata
-gd = GeoData()
+@st.cache_resource
+def load_geodata():
+    return GeoData()
+
+gd = load_geodata()
 
 # Load Excel data
-doc = xl.load_workbook(config['source']['filename'], data_only=True, read_only=True)
+@st.cache_resource
+def load_excel(filename):
+    return xl.load_workbook(filename, data_only=True, read_only=True)
+
+doc = load_excel(config['source']['filename'])
 sheet_region = doc[config['source']['sheet']['region']['name']]
 sheet_dealer = doc[config['source']['sheet']['dealer']['name']]
 sheet_key_account = doc[config['source']['sheet']['keyAccount']['name']]
