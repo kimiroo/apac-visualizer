@@ -5,6 +5,7 @@ from streamlit_folium import st_folium
 import pandas as pd
 import openpyxl as xl
 
+from lib.get_divisor import get_divisor
 from lib.click_parser import parse_click
 from lib.geodata import GeoData, filter_by_geometry
 from lib.load_data.key_account import KeyAccountData
@@ -179,16 +180,30 @@ with col1:
 
     if geojson is not None and not geojson.empty:
 
+        # Copy DataFrame for dynamic scaling
+        temp_df = data_region.df.copy()
+        target_col = f'{selected_heatmap_vertical}_{selected_heatmap_value["value"]}'
+
+        # Get divisor
+        max_value = temp_df[target_col].max()
+        divisor, unit = get_divisor(max_value)
+
+        # Scale data
+        temp_df[target_col] = temp_df[target_col] / divisor
+
+        # Generate legend
+        dynamic_legend_name = f"{selected_heatmap_value['name']} ({selected_heatmap_vertical}) (Unit: {unit}$)"
+
         # Draw heatmap
         choropleth = folium.Choropleth(
             geo_data=geojson.to_json(),
-            data=data_region.df,
+            data=temp_df,
             columns=['region', f'{selected_heatmap_vertical}_{selected_heatmap_value["value"]}'],
             key_on='feature.properties.NAME_1' if is_level_1 else 'feature.properties.GID_0',
             fill_color='YlOrRd', # Yellow-Orange-Red
             fill_opacity=0.6,
             line_opacity=0.2,
-            legend_name='Total Revenue by Region',
+            legend_name=dynamic_legend_name,
             highlight=True # Hover effect
         ).add_to(m)
 

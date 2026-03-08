@@ -1,6 +1,5 @@
 import streamlit as st
 import pandas as pd
-import altair as alt
 from millify import millify
 
 from lib.get_active_verticals import GetActiveVerticalString
