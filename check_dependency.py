@@ -20,7 +20,7 @@ try:
     import streamlit
     import streamlit_folium
     import topojson
-except:
+except ImportError:
     sys.exit(1)
 else:
     sys.exit(0)

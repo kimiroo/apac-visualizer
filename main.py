@@ -10,6 +10,8 @@ import streamlit as st
 import folium
 from streamlit_folium import st_folium
 import pandas as pd
+import geopandas as gpd
+from shapely.geometry import Point
 import openpyxl as xl
 
 from lib.get_divisor import get_divisor
@@ -86,6 +88,10 @@ data_region = RegionData(config)
 data_dealer.load(sheet_dealer)
 data_key_account.load(sheet_key_account)
 data_region.load(sheet_region)
+
+# Optimize: Convert dealer data to GeoDataFrame once at startup
+geometry = [Point(xy) for xy in zip(data_dealer.df['long'], data_dealer.df['lat'])]
+data_dealer.df = gpd.GeoDataFrame(data_dealer.df, geometry=geometry, crs="EPSG:4326")
 
 panel_dealer = DealerPanel(data_dealer.df, config)
 panel_region = RegionPanel(data_region.df, data_key_account.df, config)

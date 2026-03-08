@@ -8,7 +8,7 @@ import pandas as pd
 import geopandas as gpd
 from shapely.geometry import Point
 
-GEODATA_PATH = Path('geodata/original')
+GEODATA_PATH = Path(__file__).parent.parent / 'geodata/original'
 
 class GeoData:
     """Manages loading and retrieving of country and region geospatial data."""
@@ -75,7 +75,7 @@ class GeoData:
             except Exception:
                 return None
 
-def filter_by_geometry(dataframe: pd.DataFrame, country_gdf: gpd.GeoDataFrame, region: str | None = None) -> gpd.GeoDataFrame:
+def filter_by_geometry(dataframe: pd.DataFrame | gpd.GeoDataFrame, country_gdf: gpd.GeoDataFrame, region: str | None = None) -> gpd.GeoDataFrame:
     """Filters a DataFrame of points by a geographic boundary.
 
     Args:
@@ -87,8 +87,11 @@ def filter_by_geometry(dataframe: pd.DataFrame, country_gdf: gpd.GeoDataFrame, r
         gpd.GeoDataFrame: The filtered GeoDataFrame containing points within the boundary.
     """
     # Convert DataFrame to GeoDataFrame
-    geometry = [Point(xy) for xy in zip(dataframe['long'], dataframe['lat'])]
-    gdf = gpd.GeoDataFrame(dataframe, geometry=geometry, crs="EPSG:4326")
+    if isinstance(dataframe, gpd.GeoDataFrame):
+        gdf = dataframe
+    else:
+        geometry = [Point(xy) for xy in zip(dataframe['long'], dataframe['lat'])]
+        gdf = gpd.GeoDataFrame(dataframe, geometry=geometry, crs="EPSG:4326")
 
     if region:
         # Filter the polygons first to get only the specific region

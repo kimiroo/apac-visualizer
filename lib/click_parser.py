@@ -2,7 +2,7 @@
 
 import re
 
-filter_click_type = r'^(?:\s*)(Region|Dealer):'
+filter_click_type = r'(?:^|>|\s)(Region|Dealer):'
 
 filter_region = r'(?:\s+)(.+)'
 filter_dealer = r'^Dealer: .* \((.*)\)'
