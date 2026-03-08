@@ -112,6 +112,8 @@ selected_heatmap_value = st.sidebar.selectbox(
     format_func=lambda x: x['name']
 )
 
+st.sidebar.caption("💡 Tip: 'Value' filter doesn't apply to the Dealer list in the right info panel.")
+
 # View
 st.sidebar.header('View')
 
