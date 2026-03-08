@@ -14,11 +14,7 @@ class RegionData:
         ### Parse header
         headers = {}
 
-        optional_headers = []
-        if self._config['source']['sheet']['region']['addOthers']:
-            optional_headers.append('Others')
-        if self._config['source']['sheet']['region']['addTotal']:
-            optional_headers.append('Total')
+        extra_headers = ['Others', 'Total']
 
         col_start_idx = 2
         col_vertical = None
@@ -43,7 +39,7 @@ class RegionData:
                 continue
 
             # New vertical found
-            if cell.value in self._config['vertical'] + optional_headers:
+            if cell.value in self._config['vertical'] + extra_headers:
                 col_vertical = cell.value
 
         if col_vertical:
@@ -58,7 +54,7 @@ class RegionData:
             row_data = [str(region[i].value) for i in range(2)]
 
             # Add columns for each vertical dynamically
-            for vertical in self._config['vertical'] + optional_headers:
+            for vertical in self._config['vertical'] + extra_headers:
                 for idx in range(6):
                     base_idx = headers[vertical]
                     row_data.append(region[base_idx + idx].value)
@@ -68,7 +64,7 @@ class RegionData:
         ### Dynamically set columns
         columns_region = ['country', 'region']
 
-        for vertical in self._config['vertical'] + optional_headers:
+        for vertical in self._config['vertical'] + extra_headers:
             columns = [
                 f'{vertical}_plant_cnt',
                 f'{vertical}_dealer_cnt',

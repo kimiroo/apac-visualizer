@@ -6,8 +6,6 @@ source:
   sheet:
     region:
       name: Region Vertical Overview
-      addOthers: True # Consider removing
-      addTotal: True # Consider removing
     dealer:
       name: Dealer List
     keyAccount:
