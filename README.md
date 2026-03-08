@@ -4,7 +4,7 @@
 Visualizer for dealer and plant overview
 
 ## Requirements
-- Python 3.10+
+- Python 3.14 (Other recent Python versions **SHOULD** work, but are **NOT TESTED**.)
 - Git (Optional)
 
 
@@ -21,11 +21,10 @@ py install 3.14
 ### Alternative way to install Python 3
 If your organization doesn't allow Microsoft Store or you can't use `winget`,
 you should manually install Python from [python.org](python.org).
-1. Head to [https://www.python.org/downloads/windows](https://www.python.org/downloads/windows)
-and click latest **Python 3 Release**. (Not Python install manager)
+1. Head to [https://www.python.org/downloads/release/python-3143/](https://www.python.org/downloads/release/python-3143/)
 2. Scroll down and download **Windows installer (64-bit)** (Or whatever python.org recommends)\
 (DO NOT download Python install manager)
-3. Install Python 3 with default options
+3. Install Python 3.14 with default options
 
 ### Installing Git
 If you want to easily copy and update source code, you should install Git.
