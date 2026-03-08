@@ -16,6 +16,7 @@ class RegionPanel:
 
     def draw(self, country: str, region: str, selected_vertical, df_filtered_dealers: pd.DataFrame = None):
 
+        ### Data Filtering
         data = self._df_d[(self._df_d['country'] == str(country)) & (self._df_d['region'] == str(region))]
 
         if data.empty:
@@ -24,10 +25,15 @@ class RegionPanel:
 
         row = data.iloc[0]
 
+        ### Common
         st.subheader(f'📍 Region: {region} ({selected_vertical})')
 
-        ### Common
         verticals = self._config['vertical'] + ['Others', 'Total']
+        show_pie_chart = True
+
+        if selected_vertical != 'Total':
+            verticals = [selected_vertical]
+            show_pie_chart = False
 
 
         ### Summary
@@ -107,45 +113,45 @@ class RegionPanel:
         df_share = pd.DataFrame(plot_share)
 
         # Draw pie chart
-        chart_share = pie_chart_with_percentage(df_share, '$,.2f')
-        if chart_share:
-            st.altair_chart(chart_share, width='stretch')
-        else:
-            st.warning('No data to display')
+        if show_pie_chart:
+            chart_share = pie_chart_with_percentage(df_share, '$,.2f')
+            if chart_share:
+                st.altair_chart(chart_share, width='stretch')
+            else:
+                st.warning('No data to display')
 
 
         ### Filtered Dealers
-        st.write(f'##### 🤝 Dealer list ({selected_vertical})')
+        st.write(f'##### 🤝 Dealer list (Vertical: {selected_vertical})')
 
-        if not df_filtered_dealers.empty:
+        v_cols = self._config['vertical']
 
-            v_cols = self._config['vertical']
+        display_df = df_filtered_dealers[['id', 'name', 'tier', 'profile', 'location']].copy()
+        display_df['Vertical'] = df_filtered_dealers[v_cols].apply(self._active_vertical.get, axis=1)
 
-            display_df = df_filtered_dealers[['id', 'name', 'tier', 'profile', 'location']].copy()
-            display_df['Vertical'] = df_filtered_dealers[v_cols].apply(self._active_vertical.get, axis=1)
+        display_df.columns = ['ID', 'Name', 'Tier', 'Profile', 'Location', 'Vertical']
 
-            display_df.columns = ['ID', 'Name', 'Tier', 'Profile', 'Location', 'Vertical']
+        # Reset index and convert to human-friendly numbering
+        display_df = display_df.reset_index(drop=True)
+        display_df.index = display_df.index + 1
 
-            # Reset index and convert to human-friendly numbering
-            display_df = display_df.reset_index(drop=True)
-            display_df.index = display_df.index + 1
+        # Draw
+        st.dataframe(
+            display_df,
+            on_select='ignore',
+            use_container_width=True,
+            column_config={
+                'ID': st.column_config.TextColumn('ID', width=100),
+                'Name': st.column_config.TextColumn('Name', width='medium'),
+                'Tier': st.column_config.TextColumn('Tier', width='small'),
+                'Profile': st.column_config.TextColumn('Profile', width=150),
+                'Location': st.column_config.TextColumn('Location', width='medium'),
+                'Vertical': st.column_config.TextColumn('Vertical', width='large')
+            }
+        )
 
-            # Draw
-            st.dataframe(
-                display_df,
-                on_select='ignore',
-                use_container_width=True,
-                column_config={
-                    'ID': st.column_config.TextColumn('ID', width=100),
-                    'Name': st.column_config.TextColumn('Name', width='medium'),
-                    'Tier': st.column_config.TextColumn('Tier', width='small'),
-                    'Profile': st.column_config.TextColumn('Profile', width=150),
-                    'Location': st.column_config.TextColumn('Location', width='medium'),
-                    'Vertical': st.column_config.TextColumn('Vertical', width='large')
-                }
-            )
-        else:
-            st.warning('No data to display')
+        st.caption("💡 Tip: This table is affected by 'Vertical' filter under 'Heatmap'.")
+
 
         ### Key Accounts
         st.write(f'##### ❤️ Key Account')
