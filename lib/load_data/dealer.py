@@ -17,7 +17,7 @@ class DealerData:
 
         for partner in sheet.iter_rows(2):
             # Fixed data columns
-            row_data = [partner[i].value for i in range(12)]
+            row_data = [str(partner[i].value) for i in range(7)] + [partner[i].value for i in range(7, 12)]
 
             # Append boolean values for vertical columns dynamically
             for vertical in self._config['vertical']:

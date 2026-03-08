@@ -10,6 +10,9 @@ from lib.geodata import GeoData, filter_by_geometry
 from lib.load_data.key_account import KeyAccountData
 from lib.load_data.dealer import DealerData
 from lib.load_data.region import RegionData
+from lib.panel.dealer import DealerPanel
+from lib.panel.region import RegionPanel
+
 
 ##############
 ### Config ###
@@ -50,6 +53,9 @@ data_region = RegionData(config)
 data_dealer.load(sheet_dealer)
 data_key_account.load(sheet_key_account)
 data_region.load(sheet_region)
+
+panel_dealer = DealerPanel(data_dealer.df, config)
+panel_region = RegionPanel(data_region.df, config)
 
 
 ###############
@@ -208,7 +214,6 @@ with col1:
     map_data = st_folium(m, width='100%', height=1000)
 
 with col2:
-    st.subheader('Selected Details')
     # Check if a user clicked a region or a point
     if map_data.get('last_object_clicked'):
 
@@ -216,7 +221,10 @@ with col2:
 
         obj_type, obj_name = parse_click(last_tooltip)
 
-        st.write(f'You clicked on: {obj_name} ({obj_type})')
-        # You can filter your Pandas DataFrame here and show charts
+        if obj_type == 'dealer':
+            panel_dealer.draw(obj_name)
+        elif obj_type == 'region':
+            panel_region.draw(selected_country['name'], obj_name)
+
     else:
         st.info('Click a region or a pin on the map to see details.')

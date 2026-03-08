@@ -55,7 +55,7 @@ class RegionData:
 
         for region in sheet.iter_rows(3):
             # Fixed data columns
-            row_data = [region[i].value for i in range(2)]
+            row_data = [str(region[i].value) for i in range(2)]
 
             # Add columns for each vertical dynamically
             for vertical in self._config['vertical'] + optional_headers:

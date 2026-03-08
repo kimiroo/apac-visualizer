@@ -1,13 +1,13 @@
 app:
-  title: APAC Interactive Factory Map
+  title: APAC Geo-Coverage Tool
   favicon: assets/plana.png
 source:
   filename: 'Dataset.xlsx'
   sheet:
     region:
       name: Region Vertical Overview
-      addOthers: True
-      addTotal: True
+      addOthers: True # Consider removing
+      addTotal: True # Consider removing
     dealer:
       name: Dealer List
     keyAccount:
