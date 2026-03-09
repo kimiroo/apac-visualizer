@@ -24,33 +24,49 @@ class RegionPanel:
         self._config: dict = config
         self._active_vertical = GetActiveVerticalString(self._config)
 
-    def draw(self, country: str, region: str, selected_vertical: str, df_filtered_dealers: pd.DataFrame | None = None) -> None:
+    def draw(self,
+             country: str,
+             vertical: str,
+             region: str | None = None,
+             df_filtered_dealers: pd.DataFrame | None = None) -> None:
         """Renders the region information panel.
 
         Args:
             country (str): The name of the country.
             region (str): The name of the region.
-            selected_vertical (str): The currently selected vertical filter.
+            vertical (str): The currently selected vertical filter.
             df_filtered_dealers (pd.DataFrame, optional): Filtered dataframe of dealers. Defaults to None.
         """
 
         ### Data Filtering
-        data = self._df_d[(self._df_d['country'] == str(country)) & (self._df_d['region'] == str(region))]
+
+        # Create filter mask
+        mask_data = (self._df_d['country'] == str(country))
+
+        if region:
+            mask_data &= (self._df_d['region'] == str(region))
+
+        # Filter data
+        data = self._df_d[mask_data]
 
         if data.empty:
             st.warning('No data found for this region.')
             return
 
-        row = data.iloc[0]
+        # Select a row if it's region, or sum rows if it's country
+        row = data.iloc[0] if region else data.sum(numeric_only=True)
 
         ### Common
-        st.subheader(f'📍 Region: {region} ({selected_vertical})')
+        if region:
+            st.subheader(f'📍 Region: {region} ({vertical})')
+        else:
+            st.subheader(f'📍 Country: {country} ({vertical})')
 
         verticals = self._config['vertical'] + ['Others', 'Total']
         show_pie_chart = True
 
-        if selected_vertical != 'Total':
-            verticals = [selected_vertical]
+        if vertical != 'Total':
+            verticals = [vertical]
             show_pie_chart = False
 
 
@@ -140,7 +156,7 @@ class RegionPanel:
 
 
         ### Filtered Dealers
-        st.write(f'##### 🤝 Dealer list (Vertical: {selected_vertical})')
+        st.write(f'##### 🤝 Dealer list (Vertical: {vertical})')
 
         v_cols = self._config['vertical']
 
@@ -174,9 +190,17 @@ class RegionPanel:
         ### Key Accounts
         st.write(f'##### ❤️ Key Account')
 
-        key_account = self._df_k[(self._df_k['country'] == str(country)) & (self._df_k['region'] == str(region))]
-        key_account = key_account[['name', 'vertical']].copy()
+        # Create filter mask
+        mask_k = (self._df_k['country'] == str(country))
 
+        if region:
+            mask_k &= (self._df_k['region'] == str(region))
+
+        # Filter data
+        key_account = self._df_k[mask_k]
+
+        # Refine data
+        key_account = key_account[['name', 'vertical']].copy()
         key_account.columns = ['Name', 'Vertical']
 
         # Reset index and convert to human-friendly numbering

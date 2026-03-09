@@ -155,6 +155,7 @@ if st.sidebar.button('Clear selection'):
     st.session_state.click_type = None
     st.session_state.selected_dealer = None
     st.session_state.selected_region = None
+    st.rerun()
 
 st.sidebar.caption("💡 Tip: 'Clear selection' button clears region/dealer selection on the map.")
 
@@ -341,6 +342,7 @@ with col2:
 
             if st.session_state.get('click_type') == 'dealer':
                 panel_dealer.draw(st.session_state.selected_dealer)
+
             elif st.session_state.get('click_type') == 'region':
                 ### Filter for info panel
                 df_filtered_dealer_info_panel = data_dealer.df
@@ -359,11 +361,34 @@ with col2:
 
                 ### Draw
                 panel_region.draw(
-                    selected_country['name'],
-                    st.session_state.selected_region,
-                    selected_heatmap_vertical,
-                    df_filtered_dealer_info_panel
+                    country = selected_country['name'],
+                    vertical = selected_heatmap_vertical,
+                    region = st.session_state.selected_region,
+                    df_filtered_dealers = df_filtered_dealer_info_panel
                 )
 
         else:
-            st.info('Click a region or a pin on the map to see details.')
+            if selected_country['name'] != 'All':
+                ### Filter for info panel
+                df_filtered_dealer_info_panel = data_dealer.df
+
+                # Vertical
+                if selected_heatmap_vertical != 'Total':
+                    if selected_heatmap_vertical == 'Others':
+                        df_filtered_dealer_info_panel = data_dealer.df.iloc[0:0]
+                    else:
+                        df_filtered_dealer_info_panel = data_dealer.df[data_dealer.df[selected_heatmap_vertical]]
+
+                # Country
+                df_filtered_dealer_info_panel = filter_by_geometry(df_filtered_dealer_info_panel,
+                                                                   geojson,
+                                                                   st.session_state.selected_region)
+
+                ### Draw
+                panel_region.draw(
+                    country = selected_country['name'],
+                    vertical = selected_heatmap_vertical,
+                    df_filtered_dealers = df_filtered_dealer_info_panel
+                )
+            else:
+                st.info('Click a pin on the map to see details.')
