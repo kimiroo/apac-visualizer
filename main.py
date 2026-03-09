@@ -113,19 +113,29 @@ if 'selected_region' not in st.session_state:
 
 # State updater
 def sync_click_state(map_data):
-    if map_data and map_data.get('last_object_clicked'):
-        last_tooltip = map_data.get('last_object_clicked_tooltip')
-        obj_type, obj_name = parse_click(last_tooltip)
 
-        # Store states to session state
-        st.session_state.click_type = obj_type
+    # No click data
+    if not map_data or not map_data.get('last_object_clicked'):
+        return
 
-        if obj_type == 'dealer':
-            st.session_state.selected_dealer = obj_name
-        elif obj_type == 'region':
-            st.session_state.selected_region = obj_name
-            st.rerun()
-            # Optional: st.rerun() # 클릭 즉시 반영을 위해 필요할 수 있음
+    last_tooltip = map_data.get('last_object_clicked_tooltip')
+    click_type, obj_name = parse_click(last_tooltip)
+
+    is_same_dealer = (click_type == 'dealer' and st.session_state.get('selected_dealer') == obj_name)
+    is_same_region = (click_type == 'region' and st.session_state.get('selected_region') == obj_name)
+
+    if st.session_state.get('click_type') == click_type and (is_same_dealer or is_same_region):
+        return
+
+    # Store states to session state
+    st.session_state.click_type = click_type
+
+    if click_type == 'dealer':
+        st.session_state.selected_dealer = obj_name
+
+    elif click_type == 'region':
+        st.session_state.selected_region = obj_name
+        st.rerun()
 
 
 ###############
