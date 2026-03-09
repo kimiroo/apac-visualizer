@@ -74,18 +74,16 @@ class RegionPanel:
         col1, col2, col3, col4 = st.columns(4)
 
         with col1:
-            total_prj_rev = row['Total_projected_dealer_revenue']
-            st.metric(label='Total Market Value', value=f'${millify(total_prj_rev, precision=2)}')
+            total_prj_rev = row[f'{vertical}_projected_dealer_revenue']
+            st.metric(label='Total Market Value', value=f'${millify(total_prj_rev, precision=1)}')
         with col2:
-            total_act_rev = row['Total_actual_dealer_revenue']
-            st.metric(label='Potential Market Value', value=f'${millify(total_act_rev, precision=2)}')
+            total_act_rev = row[f'{vertical}_actual_dealer_revenue']
+            st.metric(label='Potential Market Value', value=f'${millify(total_act_rev, precision=1)}')
         with col3:
-            dealer_cnt_cols = self._df_d.columns[self._df_d.columns.str.endswith('_plant_cnt')]
-            dealer_cnt = row[dealer_cnt_cols].sum()
+            dealer_cnt = row[f'{vertical}_plant_cnt']
             st.metric(label='Dealer Count', value=dealer_cnt)
         with col4:
-            plant_cnt_cols = self._df_d.columns[self._df_d.columns.str.endswith('_dealer_cnt')]
-            plant_cnt = row[plant_cnt_cols].sum()
+            plant_cnt = row[f'{vertical}_dealer_cnt']
             st.metric(label='Plant Count', value=plant_cnt)
 
 
