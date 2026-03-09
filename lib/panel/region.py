@@ -71,19 +71,20 @@ class RegionPanel:
 
 
         ### Summary
-        col1, col2, col3, col4 = st.columns(4)
+        col1, col2 = st.columns(2)
 
         with col1:
             total_prj_rev = row[f'{vertical}_projected_dealer_revenue']
+            dealer_cnt = row[f'{vertical}_plant_cnt']
+
             st.metric(label='Total Market Value', value=f'${millify(total_prj_rev, precision=1)}')
+            st.metric(label='Dealer Count', value=dealer_cnt)
+
         with col2:
             total_act_rev = row[f'{vertical}_actual_dealer_revenue']
-            st.metric(label='Potential Market Value', value=f'${millify(total_act_rev, precision=1)}')
-        with col3:
-            dealer_cnt = row[f'{vertical}_plant_cnt']
-            st.metric(label='Dealer Count', value=dealer_cnt)
-        with col4:
             plant_cnt = row[f'{vertical}_dealer_cnt']
+
+            st.metric(label='Potential Market Value', value=f'${millify(total_act_rev, precision=1)}')
             st.metric(label='Plant Count', value=plant_cnt)
 
 
