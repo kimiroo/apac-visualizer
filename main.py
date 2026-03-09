@@ -97,6 +97,37 @@ panel_dealer = DealerPanel(data_dealer.df, config)
 panel_region = RegionPanel(data_region.df, data_key_account.df, config)
 
 
+###################
+### Click State ###
+###################
+
+# Initialize State
+if 'click_type' not in st.session_state:
+    st.session_state.click_type = None
+
+if 'selected_dealer' not in st.session_state:
+    st.session_state.selected_dealer = None
+
+if 'selected_region' not in st.session_state:
+    st.session_state.selected_region = None
+
+# State updater
+def sync_click_state(map_data):
+    if map_data and map_data.get('last_object_clicked'):
+        last_tooltip = map_data.get('last_object_clicked_tooltip')
+        obj_type, obj_name = parse_click(last_tooltip)
+
+        # Store states to session state
+        st.session_state.click_type = obj_type
+
+        if obj_type == 'dealer':
+            st.session_state.selected_dealer = obj_name
+        elif obj_type == 'region':
+            st.session_state.selected_region = obj_name
+            st.rerun()
+            # Optional: st.rerun() # 클릭 즉시 반영을 위해 필요할 수 있음
+
+
 ###############
 ### Sidebar ###
 ###############
@@ -109,6 +140,13 @@ selected_country = st.sidebar.selectbox(
     options=gd.country_list,
     format_func=lambda x: x['name']
 )
+
+if st.sidebar.button('Clear selection'):
+    st.session_state.click_type = None
+    st.session_state.selected_dealer = None
+    st.session_state.selected_region = None
+
+st.sidebar.caption("💡 Tip: 'Clear selection' button clears region/dealer selection on the map.")
 
 # Dealer
 st.sidebar.header('Dealer')
@@ -176,11 +214,11 @@ selected_column_ratio = st.sidebar.selectbox(
 geojson, is_level_1 = gd.get_geojson(selected_country['code'])
 
 ### Shallow copy DataFrames
-df_filtered_dealer = data_dealer.df.copy()
+df_filtered_dealer_map_panel = data_dealer.df.copy()
 
 ### Filter country
 if geojson is not None and not geojson.empty:
-    df_filtered_dealer = filter_by_geometry(df_filtered_dealer, geojson)
+    df_filtered_dealer_map_panel = filter_by_geometry(df_filtered_dealer_map_panel, geojson)
 
 ### Filter vertical
 actual_verticals = [i for i in selected_verticals if i != 'None']
@@ -188,23 +226,23 @@ include_none = 'None' in selected_verticals
 
 # Mask for rows where at least one selected vertical is True
 if actual_verticals:
-    vertical_mask = df_filtered_dealer[actual_verticals].any(axis=1)
+    vertical_mask = df_filtered_dealer_map_panel[actual_verticals].any(axis=1)
 else:
-    vertical_mask = pd.Series(False, index=df_filtered_dealer.index)
+    vertical_mask = pd.Series(False, index=df_filtered_dealer_map_panel.index)
 
 # Mask for rows where ALL vertical columns are False (None case)
 if include_none:
     all_verticals = config['vertical']
-    none_mask = ~df_filtered_dealer[all_verticals].any(axis=1)
+    none_mask = ~df_filtered_dealer_map_panel[all_verticals].any(axis=1)
     is_in_selected_verticals = vertical_mask | none_mask
 else:
     is_in_selected_verticals = vertical_mask
 
 # Final filtering
-df_filtered_dealer = df_filtered_dealer[is_in_selected_verticals]
+df_filtered_dealer_map_panel = df_filtered_dealer_map_panel[is_in_selected_verticals]
 
 ### Filter tier
-df_filtered_dealer = df_filtered_dealer[df_filtered_dealer['tier'].isin(selected_tiers)]
+df_filtered_dealer_map_panel = df_filtered_dealer_map_panel[df_filtered_dealer_map_panel['tier'].isin(selected_tiers)]
 
 
 ##############
@@ -258,8 +296,17 @@ with col1:
 
         m.fit_bounds([sw, ne])
 
+    # Filter dealer pin if region is selected
+    if st.session_state.get('selected_region'):
+        # Workaround for 'index_right' cannot be a column name in the frames being joined
+        df_filtered_dealer_map_panel = df_filtered_dealer_map_panel.drop(['index_right'], axis=1)
+
+        df_filtered_dealer_map_panel = filter_by_geometry(df_filtered_dealer_map_panel,
+                                                          geojson,
+                                                          st.session_state.selected_region)
+
     # Draw dealer pins
-    for _, row in df_filtered_dealer.iterrows():
+    for _, row in df_filtered_dealer_map_panel.iterrows():
         # Check for NaN coordinates to avoid errors
         if pd.notnull(row['lat']) and pd.notnull(row['long']):
             folium.Marker(
@@ -273,19 +320,18 @@ with col1:
     # Display Map and Capture User Interaction
     map_data = st_folium(m, width='100%', height=900)
 
+    # Sync click state
+    sync_click_state(map_data)
+
 with col2:
     # Make column scrollable
     with st.container(height=900):
         # Check if a user clicked a region or a point
-        if map_data.get('last_object_clicked'):
+        if st.session_state.get('click_type'):
 
-            last_tooltip = map_data.get('last_object_clicked_tooltip')
-
-            obj_type, obj_name = parse_click(last_tooltip)
-
-            if obj_type == 'dealer':
-                panel_dealer.draw(obj_name)
-            elif obj_type == 'region':
+            if st.session_state.get('click_type') == 'dealer':
+                panel_dealer.draw(st.session_state.selected_dealer)
+            elif st.session_state.get('click_type') == 'region':
                 ### Filter for info panel
                 df_filtered_dealer_info_panel = data_dealer.df
 
@@ -297,10 +343,17 @@ with col2:
                         df_filtered_dealer_info_panel = data_dealer.df[data_dealer.df[selected_heatmap_vertical]]
 
                 # Country
-                df_filtered_dealer_info_panel = filter_by_geometry(df_filtered_dealer_info_panel, geojson, obj_name)
+                df_filtered_dealer_info_panel = filter_by_geometry(df_filtered_dealer_info_panel,
+                                                                   geojson,
+                                                                   st.session_state.selected_region)
 
                 ### Draw
-                panel_region.draw(selected_country['name'], obj_name, selected_heatmap_vertical, df_filtered_dealer_info_panel)
+                panel_region.draw(
+                    selected_country['name'],
+                    st.session_state.selected_region,
+                    selected_heatmap_vertical,
+                    df_filtered_dealer_info_panel
+                )
 
         else:
             st.info('Click a region or a pin on the map to see details.')
