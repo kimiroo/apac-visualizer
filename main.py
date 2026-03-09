@@ -271,34 +271,36 @@ with col1:
             ).add_to(m)
 
     # Display Map and Capture User Interaction
-    map_data = st_folium(m, width='100%', height=1000)
+    map_data = st_folium(m, width='100%', height=900)
 
 with col2:
-    # Check if a user clicked a region or a point
-    if map_data.get('last_object_clicked'):
+    # Make column scrollable
+    with st.container(height=900):
+        # Check if a user clicked a region or a point
+        if map_data.get('last_object_clicked'):
 
-        last_tooltip = map_data.get('last_object_clicked_tooltip')
+            last_tooltip = map_data.get('last_object_clicked_tooltip')
 
-        obj_type, obj_name = parse_click(last_tooltip)
+            obj_type, obj_name = parse_click(last_tooltip)
 
-        if obj_type == 'dealer':
-            panel_dealer.draw(obj_name)
-        elif obj_type == 'region':
-            ### Filter for info panel
-            df_filtered_dealer_info_panel = data_dealer.df
+            if obj_type == 'dealer':
+                panel_dealer.draw(obj_name)
+            elif obj_type == 'region':
+                ### Filter for info panel
+                df_filtered_dealer_info_panel = data_dealer.df
 
-            # Vertical
-            if selected_heatmap_vertical != 'Total':
-                if selected_heatmap_vertical == 'Others':
-                    df_filtered_dealer_info_panel = data_dealer.df.iloc[0:0]
-                else:
-                    df_filtered_dealer_info_panel = data_dealer.df[data_dealer.df[selected_heatmap_vertical]]
+                # Vertical
+                if selected_heatmap_vertical != 'Total':
+                    if selected_heatmap_vertical == 'Others':
+                        df_filtered_dealer_info_panel = data_dealer.df.iloc[0:0]
+                    else:
+                        df_filtered_dealer_info_panel = data_dealer.df[data_dealer.df[selected_heatmap_vertical]]
 
-            # Country
-            df_filtered_dealer_info_panel = filter_by_geometry(df_filtered_dealer_info_panel, geojson, obj_name)
+                # Country
+                df_filtered_dealer_info_panel = filter_by_geometry(df_filtered_dealer_info_panel, geojson, obj_name)
 
-            ### Draw
-            panel_region.draw(selected_country['name'], obj_name, selected_heatmap_vertical, df_filtered_dealer_info_panel)
+                ### Draw
+                panel_region.draw(selected_country['name'], obj_name, selected_heatmap_vertical, df_filtered_dealer_info_panel)
 
-    else:
-        st.info('Click a region or a pin on the map to see details.')
+        else:
+            st.info('Click a region or a pin on the map to see details.')
