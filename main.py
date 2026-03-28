@@ -177,9 +177,7 @@ heatmap_value_options = [
     {'name': 'Total Market Value', 'value': 'total_market_value'},
     {'name': 'Potential Market Value', 'value': 'potential_market_value'},
     {'name': 'Actual Dealer Revenue', 'value': 'actual_dealer_revenue'},
-    {'name': 'Projected Dealer Revenue', 'value': 'projected_dealer_revenue'},
-    {'name': 'Dealer Count', 'value': 'dealer_cnt'},
-    {'name': 'Plant Count', 'value': 'plant_cnt'}
+    {'name': 'Projected Dealer Revenue', 'value': 'projected_dealer_revenue'}
 ]
 
 # Handle optional options
