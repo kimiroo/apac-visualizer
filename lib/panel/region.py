@@ -217,12 +217,13 @@ class RegionPanel:
 #        )
 
         ### Remarks
-        st.write('##### 📌 Remarks')
+        if region:
+            st.write('##### 📌 Remarks')
 
-        remarks_text = row.get('remarks', None)
+            remarks_text = row.get('remarks', None)
 
-        if remarks_text and str(remarks_text).strip() != 'None':
-            st.info(f"{remarks_text}")
-        else:
-            # Placeholder when there are no remarks
-            st.caption("No specific remarks available for this dealer.")
+            if remarks_text and str(remarks_text).strip() != 'None':
+                st.info(f"{remarks_text}")
+            else:
+                # Placeholder when there are no remarks
+                st.caption("No specific remarks available for this region.")
