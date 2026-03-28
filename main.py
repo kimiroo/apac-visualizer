@@ -82,7 +82,7 @@ sheet_dealer = doc[config['source']['sheet']['dealer']['name']]
 sheet_key_account = doc[config['source']['sheet']['keyAccount']['name']]
 
 data_dealer = DealerData(config)
-data_key_account = KeyAccountData()
+data_key_account = KeyAccountData(config)
 data_region = RegionData(config)
 
 data_dealer.load(sheet_dealer)
