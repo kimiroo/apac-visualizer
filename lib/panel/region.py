@@ -88,13 +88,16 @@ class RegionPanel:
             st.metric(label='Plant Count', value=plant_cnt)
 
 
-        ### Projected vs Actual Dealer Revenue
+        ### Actual (vs Projected) Dealer Revenue
         st.write('##### 📊 Dealer Revenue')
 
         # Create a long-form dataframe for Altair
         plot_revenue = []
         for v in verticals:
-            plot_revenue.append({'Vertical': v, 'Type': 'Projected', 'Value': row[f'{v}_projected_dealer_revenue']})
+
+            if self._config['showOptionalData']['projectedRevenue']:
+                plot_revenue.append({'Vertical': v, 'Type': 'Projected', 'Value': row[f'{v}_projected_dealer_revenue']})
+
             plot_revenue.append({'Vertical': v, 'Type': 'Actual', 'Value': row[f'{v}_actual_dealer_revenue']})
 
         df_revenue = pd.DataFrame(plot_revenue)
@@ -109,7 +112,7 @@ class RegionPanel:
         st.altair_chart(chart_revenue, width='stretch')
 
 
-        ### Projected vs Actual Dealer Revenue
+        ### Potential vs Actual Market Value
         st.write('##### 📊 Market Value')
 
         # Create a long-form dataframe for Altair

@@ -38,8 +38,7 @@ with open('config.yaml', 'r', encoding='utf-8') as f:
     config = yaml.full_load(f.read())
 
 tier_color_map = {t['name']: t['color'] for t in config['tiers']}
-
-is_customer_color_map = {x['value']: x['color'] for x in config['customer']}
+is_customer_color_map = {x['value']: x['color'] for x in config['isCustomer']}
 
 
 ############
@@ -181,6 +180,17 @@ heatmap_value_options = [
     {'name': 'Projected Dealer Revenue', 'value': 'projected_dealer_revenue'},
     {'name': 'Dealer Count', 'value': 'dealer_cnt'},
     {'name': 'Plant Count', 'value': 'plant_cnt'}
+]
+
+# Handle optional options
+excluded_heatmap_options = []
+
+if not config['showOptionalData']['projectedRevenue']:
+    excluded_heatmap_options.append('projected_dealer_revenue')
+
+heatmap_value_options = [
+    opt for opt in heatmap_value_options
+    if opt['value'] not in excluded_heatmap_options
 ]
 
 selected_heatmap_value = st.sidebar.selectbox(

@@ -37,29 +37,53 @@ class DealerPanel:
 
         st.subheader(f'🤝 Dealer: {row['name']}')
 
-        performance_df = pd.DataFrame({
-            'Revenue': ['Projected', 'Actual'],
-            'Value': [row['projected_revenue'], row['actual_revenue']]
-        })
+        # Revenue Chart
+        if self._config['showOptionalData']['projectedRevenue']:
+            performance_df = pd.DataFrame({
+                'Revenue': ['Projected', 'Actual'],
+                'Value': [row['projected_revenue'], row['actual_revenue']]
+            })
 
-        chart = alt.Chart(performance_df).mark_bar().encode(
-            x=alt.X('Revenue:N', title='Revenue'),
-            y=alt.Y('Value:Q', title='Value', axis=alt.Axis(format='$,.2f')),
-            color=alt.Color('Revenue:N', scale=alt.Scale(range=['#1F77B4', '#B8B8B8'])),
-            tooltip=alt.Tooltip(format='$,.2f')
-        )
+            chart = alt.Chart(performance_df).mark_bar().encode(
+                x=alt.X('Revenue:N', title='Revenue'),
+                y=alt.Y('Value:Q', title='Value', axis=alt.Axis(format='$,.2f')),
+                color=alt.Color('Revenue:N', scale=alt.Scale(range=['#1F77B4', '#B8B8B8'])),
+                tooltip=alt.Tooltip(format='$,.2f')
+            )
 
-        st.altair_chart(chart, width='stretch')
+            st.altair_chart(chart, width='stretch')
 
         st.write('##### 📝 Dealer Information')
 
         # Extract active verticals (where value is True)
         active_vertical_string = self._active_vertical.get(row)
 
+        # Define items to show
+        items = [
+            ('ID', row['id']),
+            ('Name', row['name']),
+            ('Tier', row['tier']),
+            ('Profile', row['profile']),
+            ('Location', row['location']),
+            ('Actual Revenue', row['actual_revenue']),
+            ('Projected Revenue', row['projected_revenue']),
+            ('Verticals', active_vertical_string)
+        ]
+
+        # Handle optional keys
+        exclude_keys = []
+
+        if not self._config['showOptionalData']['projectedRevenue']:
+            exclude_keys.append('Projected Revenue')
+
+        filtered_items = [item for item in items if item[0] not in exclude_keys]
+
+        keys, values = zip(*filtered_items)
+
         # Create a clean summary table for the UI
         info_data = {
-            'Key': ['ID', 'Name', 'Tier', 'Profile', 'Location', 'Verticals'],
-            'Value': [row['id'], row['name'], row['tier'], row['profile'], row['location'], active_vertical_string]
+            'Key': list(keys),
+            'Value': list(values)
         }
 
         st.dataframe(
@@ -67,7 +91,7 @@ class DealerPanel:
             hide_index=True,
             on_select='ignore',
             column_config={
-                'Key': st.column_config.TextColumn('Key', width='small'),
+                'Key': st.column_config.TextColumn('Key', width='medium'),
                 'Value': st.column_config.TextColumn('Value', width='large')
             }
         )
