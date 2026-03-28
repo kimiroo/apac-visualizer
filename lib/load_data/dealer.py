@@ -24,33 +24,33 @@ class DealerData:
         Args:
             sheet (_WorksheetOrChartsheetLike): The Excel worksheet containing dealer data.
         """
-        partner_list = []
+        dealer_list = []
 
-        # Load partner data
+        # Load dealer data
         headers = {cell.value: i for i, cell in enumerate(sheet[1])}
 
-        for partner in sheet.iter_rows(2):
+        for dealer in sheet.iter_rows(2):
             # Fixed data columns
-            row_data = [str(partner[i].value) for i in range(7)] + [partner[i].value for i in range(7, 12)]
+            row_data = [str(dealer[i].value) for i in range(8)] + [dealer[i].value for i in range(8, 13)]
 
             # Append boolean values for vertical columns dynamically
             for vertical in self._config['vertical']:
                 row_data.append(
-                    bool(partner[headers[vertical]].value)
+                    bool(dealer[headers[vertical]].value)
                 )
 
-            partner_list.append(tuple(row_data))
+            dealer_list.append(tuple(row_data))
 
         # Dynamically set extra columns
-        columns_partner = [
+        columns_dealer = [
             'area', 'country', 'sales_org',
-            'id', 'name', 'tier', 'profile',
+            'id', 'name', 'tier', 'profile', 'remarks',
             'location', 'lat', 'long',
             'projected_revenue', 'actual_revenue'
         ]
 
         for vertical in self._config['vertical']:
-            columns_partner.append(vertical)
+            columns_dealer.append(vertical)
 
         # Convert to Pandas DataFrame
-        self.df = pd.DataFrame(partner_list, columns=columns_partner)
+        self.df = pd.DataFrame(dealer_list, columns=columns_dealer)

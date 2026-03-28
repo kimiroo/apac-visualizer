@@ -31,7 +31,7 @@ class KeyAccountData:
 
         for key_account in sheet.iter_rows(2):
             # Fixed data columns
-            row_data = [str(key_account[i].value) for i in range(6)] + [key_account[i].value for i in range(6, 10)] + [bool(key_account[10].value)]
+            row_data = [str(key_account[i].value) for i in range(7)] + [key_account[i].value for i in range(7, 11)] + [bool(key_account[11].value)]
 
             # Append boolean values for vertical columns dynamically
             for vertical in self._config['vertical']:
@@ -43,7 +43,7 @@ class KeyAccountData:
 
         # Dynamically set extra columns
         columns_key_account = [
-            'area', 'country', 'region',
+            'area', 'country', 'region', 'remarks',
             'id', 'name', 'address', 'lat', 'long',
             'value', 'water_consumption', 'is_customer'
         ]
