@@ -40,7 +40,7 @@ class RegionData:
                 continue
 
             # New vertical column
-            if ((idx - 2) % 6 == 0) and (idx != col_start_idx):
+            if ((idx - 2) % 5 == 0) and (idx != col_start_idx):
                 # Append to headers
                 headers[col_vertical] = col_start_idx
 
@@ -69,8 +69,9 @@ class RegionData:
 
             # Add columns for each vertical dynamically
             for vertical in self._config['vertical'] + extra_headers:
-                for idx in range(6):
-                    base_idx = headers[vertical]
+                base_idx = headers[vertical]
+
+                for idx in range(5):
                     row_data.append(region[base_idx + idx].value)
 
             region_list.append(tuple(row_data))
@@ -81,7 +82,6 @@ class RegionData:
         for vertical in self._config['vertical'] + extra_headers:
             columns = [
                 f'{vertical}_plant_cnt',
-                f'{vertical}_dealer_cnt',
                 f'{vertical}_projected_dealer_revenue',
                 f'{vertical}_actual_dealer_revenue',
                 f'{vertical}_potential_market_value',
