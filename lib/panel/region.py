@@ -191,28 +191,38 @@ class RegionPanel:
 
         ### Key Accounts
         st.write(f'##### ❤️ Key Account')
-        return
 
         # Create filter mask
-        mask_k = (self._df_k['country'] == str(country))
+#        mask_k = (self._df_k['country'] == str(country))
+#
+#        if region:
+#            mask_k &= (self._df_k['region'] == str(region))
+#
+#        # Filter data
+#        key_account = self._df_k[mask_k]
+#
+#        # Refine data
+#        key_account = key_account[['name', 'vertical']].copy()
+#        key_account.columns = ['Name', 'Vertical']
+#
+#        # Reset index and convert to human-friendly numbering
+#        key_account = key_account.reset_index(drop=True)
+#        key_account.index = key_account.index + 1
+#
+#        # Draw
+#        st.dataframe(
+#            key_account,
+#            on_select='ignore',
+#            width='content',
+#        )
 
-        if region:
-            mask_k &= (self._df_k['region'] == str(region))
+        ### Remarks
+        st.write('##### 📌 Remarks')
 
-        # Filter data
-        key_account = self._df_k[mask_k]
+        remarks_text = row.get('remarks', None)
 
-        # Refine data
-        key_account = key_account[['name', 'vertical']].copy()
-        key_account.columns = ['Name', 'Vertical']
-
-        # Reset index and convert to human-friendly numbering
-        key_account = key_account.reset_index(drop=True)
-        key_account.index = key_account.index + 1
-
-        # Draw
-        st.dataframe(
-            key_account,
-            on_select='ignore',
-            width='content',
-        )
+        if remarks_text and str(remarks_text).strip() != 'None':
+            st.info(f"{remarks_text}")
+        else:
+            # Placeholder when there are no remarks
+            st.caption("No specific remarks available for this dealer.")

@@ -37,7 +37,7 @@ class DealerPanel:
 
         st.subheader(f'🤝 Dealer: {row['name']}')
 
-        # Revenue Chart
+        ### Revenue Chart
         if self._config['showOptionalData']['projectedRevenue']:
             performance_df = pd.DataFrame({
                 'Revenue': ['Projected', 'Actual'],
@@ -53,6 +53,7 @@ class DealerPanel:
 
             st.altair_chart(chart, width='stretch')
 
+        ### Information Table
         st.write('##### 📝 Dealer Information')
 
         # Extract active verticals (where value is True)
@@ -95,3 +96,14 @@ class DealerPanel:
                 'Value': st.column_config.TextColumn('Value', width='large')
             }
         )
+
+        ### Remarks
+        st.write('##### 📌 Remarks')
+
+        remarks_text = row.get('remarks', None)
+
+        if remarks_text and str(remarks_text).strip() != 'None':
+            st.info(f"{remarks_text}")
+        else:
+            # Placeholder when there are no remarks
+            st.caption("No specific remarks available for this dealer.")
