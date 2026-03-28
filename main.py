@@ -17,6 +17,7 @@ import openpyxl as xl
 from lib.get_divisor import get_divisor
 from lib.click_parser import parse_click
 from lib.geodata import GeoData, filter_by_geometry
+from lib.filter_vertical import filter_by_vertical
 from lib.load_data.key_account import KeyAccountData
 from lib.load_data.dealer import DealerData
 from lib.load_data.region import RegionData
@@ -37,6 +38,8 @@ with open('config.yaml', 'r', encoding='utf-8') as f:
     config = yaml.full_load(f.read())
 
 tier_color_map = {t['name']: t['color'] for t in config['tiers']}
+
+is_customer_color_map = {x['value']: x['color'] for x in config['customer']}
 
 
 ############
@@ -147,6 +150,7 @@ st.sidebar.header('Common')
 
 selected_country = st.sidebar.selectbox(
     'Country',
+    key='selected_country',
     options=gd.country_list,
     format_func=lambda x: x['name']
 )
@@ -159,26 +163,12 @@ if st.sidebar.button('Clear selection'):
 
 st.sidebar.caption("💡 Tip: 'Clear selection' button clears region/dealer selection on the map.")
 
-# Dealer
-st.sidebar.header('Dealer')
-
-selected_verticals = st.sidebar.multiselect(
-    'Vertical',
-    options=config['vertical'] + ['None'],
-    default=config['vertical'] + ['None']
-)
-
-selected_tiers = st.sidebar.multiselect(
-    'Tier',
-    options=[t['name'] for t in config['tiers']],
-    default=[t['name'] for t in config['tiers']]
-)
-
 # Heatmap
 st.sidebar.header('Heatmap')
 
 selected_heatmap_vertical = st.sidebar.selectbox(
     'Vertical',
+    key='selected_heatmap_vertical',
     options=['Total'] + config['vertical'] + ['Others']
 )
 
@@ -195,11 +185,58 @@ heatmap_value_options = [
 
 selected_heatmap_value = st.sidebar.selectbox(
     'Value',
+    key='selected_heatmap_value',
     options=heatmap_value_options,
     format_func=lambda x: x['name']
 )
 
 st.sidebar.caption("💡 Tip: 'Value' filter doesn't apply to the Dealer list in the right info panel.")
+
+# Pins
+st.sidebar.header('Pins')
+
+draw_dealers_pin = st.sidebar.checkbox('Dealers', value=True)
+draw_key_account_pin = st.sidebar.checkbox('Key Account', value=True)
+
+# Dealer
+st.sidebar.header('Dealer')
+
+selected_verticals_dealer = st.sidebar.multiselect(
+    'Vertical',
+    key='selected_verticals_dealer',
+    options=config['vertical'] + ['None'],
+    default=config['vertical'] + ['None']
+)
+
+selected_tiers_dealer = st.sidebar.multiselect(
+    'Tier',
+    key='selected_tiers_dealer',
+    options=[t['name'] for t in config['tiers']],
+    default=[t['name'] for t in config['tiers']]
+)
+
+# Key Account
+st.sidebar.header('Key Account')
+
+selected_verticals_key_account = st.sidebar.multiselect(
+    'Vertical',
+    key='selected_verticals_key_account',
+    options=config['vertical'] + ['None'],
+    default=config['vertical'] + ['None']
+)
+
+is_customer_options = [
+    {'name': 'Customer', 'value': True},
+    {'name': 'Non-Customer', 'value': False}
+]
+
+selected_is_customer_key_account = st.sidebar.multiselect(
+    'Customer',
+    key='selected_is_customer_key_account',
+    options=is_customer_options,
+    default=is_customer_options,
+    format_func=lambda x: x['name']
+)
 
 # View
 st.sidebar.header('View')
@@ -212,6 +249,7 @@ column_ratio_options = [
 
 selected_column_ratio = st.sidebar.selectbox(
     'Split Ratio',
+    key='selected_column_ratio',
     options=column_ratio_options,
     format_func=lambda x: x['name']
 )
@@ -226,34 +264,33 @@ geojson, is_level_1 = gd.get_geojson(selected_country['code'])
 
 ### Shallow copy DataFrames
 df_filtered_dealer_map_panel = data_dealer.df.copy()
+df_filtered_key_account_map_panel = data_key_account.df.copy()
 
 ### Filter country
 if geojson is not None and not geojson.empty:
     df_filtered_dealer_map_panel = filter_by_geometry(df_filtered_dealer_map_panel, geojson)
+    df_filtered_key_account_map_panel = filter_by_geometry(df_filtered_key_account_map_panel, geojson)
+
 
 ### Filter vertical
-actual_verticals = [i for i in selected_verticals if i != 'None']
-include_none = 'None' in selected_verticals
+df_filtered_dealer_map_panel = filter_by_vertical(
+    df_filtered_dealer_map_panel,
+    selected_verticals_dealer,
+    config['vertical']
+)
+df_filtered_key_account_map_panel = filter_by_vertical(
+    df_filtered_key_account_map_panel,
+    selected_verticals_key_account,
+    config['vertical']
+)
 
-# Mask for rows where at least one selected vertical is True
-if actual_verticals:
-    vertical_mask = df_filtered_dealer_map_panel[actual_verticals].any(axis=1)
-else:
-    vertical_mask = pd.Series(False, index=df_filtered_dealer_map_panel.index)
+### Filter tier (Dealer)
+df_filtered_dealer_map_panel = df_filtered_dealer_map_panel[df_filtered_dealer_map_panel['tier'].isin(selected_tiers_dealer)]
 
-# Mask for rows where ALL vertical columns are False (None case)
-if include_none:
-    all_verticals = config['vertical']
-    none_mask = ~df_filtered_dealer_map_panel[all_verticals].any(axis=1)
-    is_in_selected_verticals = vertical_mask | none_mask
-else:
-    is_in_selected_verticals = vertical_mask
 
-# Final filtering
-df_filtered_dealer_map_panel = df_filtered_dealer_map_panel[is_in_selected_verticals]
-
-### Filter tier
-df_filtered_dealer_map_panel = df_filtered_dealer_map_panel[df_filtered_dealer_map_panel['tier'].isin(selected_tiers)]
+### Filter customer status (Plant)
+selected_is_customer_key_account_values = [obj['value'] for obj in selected_is_customer_key_account]
+df_filtered_key_account_map_panel = df_filtered_key_account_map_panel[df_filtered_key_account_map_panel['is_customer'].isin(selected_is_customer_key_account_values)]
 
 
 ##############
@@ -307,26 +344,43 @@ with col1:
 
         m.fit_bounds([sw, ne])
 
-    # Filter dealer pin if region is selected
+    # Filter dealer, key account pin if region is selected
     if st.session_state.get('selected_region'):
         # Workaround for 'index_right' cannot be a column name in the frames being joined
         df_filtered_dealer_map_panel = df_filtered_dealer_map_panel.drop(['index_right'], axis=1)
+        df_filtered_key_account_map_panel = df_filtered_key_account_map_panel.drop(['index_right'], axis=1)
 
         df_filtered_dealer_map_panel = filter_by_geometry(df_filtered_dealer_map_panel,
                                                           geojson,
                                                           st.session_state.selected_region)
+        df_filtered_key_account_map_panel = filter_by_geometry(df_filtered_key_account_map_panel,
+                                                               geojson,
+                                                               st.session_state.selected_region)
 
     # Draw dealer pins
-    for _, row in df_filtered_dealer_map_panel.iterrows():
-        # Check for NaN coordinates to avoid errors
-        if pd.notnull(row['lat']) and pd.notnull(row['long']):
-            folium.Marker(
-                location=[row['lat'], row['long']],
-                tooltip=f'''<b>Dealer:</b> {row['name']} ({row['id']})<br>
-                            Actual Revenue: ${row['actual_revenue']:,.2f}<br>
-                            Projected Revenue: ${row['projected_revenue']:,.2f}''',
-                icon=folium.Icon(color=tier_color_map.get(row['tier'], 'blue'), icon='briefcase', prefix='fa')
-            ).add_to(m)
+    if draw_dealers_pin:
+        for _, row in df_filtered_dealer_map_panel.iterrows():
+            # Check for NaN coordinates to avoid errors
+            if pd.notnull(row['lat']) and pd.notnull(row['long']):
+                folium.Marker(
+                    location=[row['lat'], row['long']],
+                    tooltip=f'''<b>Dealer:</b> {row['name']} ({row['id']})<br>
+                                Actual Revenue: ${row['actual_revenue']:,.2f}<br>
+                                Projected Revenue: ${row['projected_revenue']:,.2f}''',
+                    icon=folium.Icon(color=tier_color_map.get(row['tier'], 'blue'), icon='briefcase', prefix='fa')
+                ).add_to(m)
+
+    # Draw key account pins
+    if draw_key_account_pin:
+        for _, row in df_filtered_key_account_map_panel.iterrows():
+            # Check for NaN coordinates to avoid errors
+            if pd.notnull(row['lat']) and pd.notnull(row['long']):
+                folium.Marker(
+                    location=[row['lat'], row['long']],
+                    tooltip=f'''<b>Dealer:</b> {row['name']} ({row['id']})<br>
+                                Value: ${row['value']:,.2f}''',
+                    icon=folium.Icon(color=is_customer_color_map.get(row['is_customer'], 'black'), icon='industry', prefix='fa')
+                ).add_to(m)
 
     # Display Map and Capture User Interaction
     map_data = st_folium(m, width='100%', height=900)

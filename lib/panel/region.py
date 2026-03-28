@@ -188,6 +188,7 @@ class RegionPanel:
 
         ### Key Accounts
         st.write(f'##### ❤️ Key Account')
+        return
 
         # Create filter mask
         mask_k = (self._df_k['country'] == str(country))
