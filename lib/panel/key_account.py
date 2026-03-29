@@ -48,7 +48,7 @@ class KeyAccountPanel:
             ('ID', row['id']),
             ('Name', row['name']),
             ('Address', row['address']),
-            ('Is Customer', row['is_customer']),
+            ('Is Customer', str(row['is_customer'])),
             ('Value', format_currency(row['value'])),
             ('Water Consumption', format_number(row['water_consumption'], postfix=' L')),
             ('Verticals', active_vertical_string)
