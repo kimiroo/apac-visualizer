@@ -5,6 +5,11 @@ def filter_by_vertical(
         selected_verticals: list,
         vertical_list: list
 ) -> pd.DataFrame:
+
+    # Check if the selection is empty
+    if not selected_verticals:
+        return df.iloc[0:0]
+
     actual_verticals = [i for i in selected_verticals if i != 'None']
     include_none = 'None' in selected_verticals
 
