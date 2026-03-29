@@ -96,7 +96,7 @@ geometry = [Point(xy) for xy in zip(data_dealer.df['long'], data_dealer.df['lat'
 data_dealer.df = gpd.GeoDataFrame(data_dealer.df, geometry=geometry, crs="EPSG:4326")
 
 panel_dealer = DealerPanel(data_dealer.df, config)
-panel_region = RegionPanel(data_region.df, data_key_account.df, config)
+panel_region = RegionPanel(config)
 
 
 ###################
@@ -270,6 +270,10 @@ selected_column_ratio = st.sidebar.selectbox(
 ### Get corresponding GeoJSON
 geojson, is_level_1 = gd.get_geojson(selected_country['code'])
 
+# Determine the key column based on zoom level (Region vs Country)
+# If level 1 (provinces) exists, use NAME_1; otherwise, use GID_0 (Country level)
+geo_key_col = 'NAME_1' if is_level_1 else 'GID_0'
+
 ### Shallow copy DataFrames
 df_filtered_dealer_map_pins = data_dealer.df.copy()
 df_filtered_key_account_map_pins = data_key_account.df.copy()
@@ -283,7 +287,6 @@ if geojson is not None and not geojson.empty:
     df_filtered_dealer_heatmap = df_filtered_dealer_map_pins.copy()
     df_filtered_key_account_heatmap = df_filtered_key_account_map_pins.copy()
 
-
 ### Filter vertical
 df_filtered_dealer_map_pins = filter_by_vertical(
     df_filtered_dealer_map_pins,
@@ -295,25 +298,20 @@ df_filtered_key_account_map_pins = filter_by_vertical(
     selected_verticals_key_account,
     config['vertical']
 )
-df_filtered_dealer_heatmap = filter_by_vertical(
-    df_filtered_dealer_heatmap,
-    [],
-    config['vertical']
-)
-df_filtered_key_account_heatmap = filter_by_vertical(
-    df_filtered_key_account_heatmap,
-    [],
-    config['vertical']
-)
+if selected_heatmap_vertical != 'Total':
+    df_filtered_dealer_heatmap = df_filtered_dealer_heatmap[
+        df_filtered_dealer_heatmap[selected_heatmap_vertical]
+    ]
+    df_filtered_key_account_heatmap = df_filtered_key_account_heatmap[
+        df_filtered_key_account_heatmap[selected_heatmap_vertical]
+    ]
 
 ### Filter tier (Dealer)
 df_filtered_dealer_map_pins = df_filtered_dealer_map_pins[df_filtered_dealer_map_pins['tier'].isin(selected_tiers_dealer)]
 
-
 ### Filter customer status (Plant)
 selected_is_customer_key_account_values = [obj['value'] for obj in selected_is_customer_key_account]
 df_filtered_key_account_map_pins = df_filtered_key_account_map_pins[df_filtered_key_account_map_pins['is_customer'].isin(selected_is_customer_key_account_values)]
-
 
 ### Filter dealer, key account pin if region is selected
 if st.session_state.get('selected_region'):
@@ -333,9 +331,80 @@ if st.session_state.get('selected_region'):
 ### Number Crunching ###
 ########################
 
-### Dealer Count calculation
+if geojson is not None and not geojson.empty:
 
+    # 1. Convert to GeoDataFrame
+    gdf_dealer_heatmap = gpd.GeoDataFrame(
+        df_filtered_dealer_heatmap,
+        geometry=gpd.points_from_xy(df_filtered_dealer_heatmap['long'], df_filtered_dealer_heatmap['lat']),
+        crs="EPSG:4326"
+    )
 
+    # 2. Drop existing region-related columns from dealer data to avoid suffixing
+    cols_to_drop = ['NAME_1', 'GID_1', 'GID_0', 'COUNTRY']
+    gdf_dealer_heatmap = gdf_dealer_heatmap.drop(columns=[c for c in cols_to_drop if c in gdf_dealer_heatmap.columns])
+
+    # 3. Spatial Join to find which region each dealer belongs to
+    # We only need 'NAME_1' and 'geometry' from the region data
+
+    # Drop 'index_right' if it already exists to prevent ValueError during sjoin
+    if 'index_right' in gdf_dealer_heatmap.columns:
+        gdf_dealer_heatmap = gdf_dealer_heatmap.drop(columns=['index_right'])
+
+    df_joined = gpd.sjoin(
+        gdf_dealer_heatmap,
+        geojson[[geo_key_col, 'geometry']],
+        how='left',
+        predicate='within'
+    )
+
+    # 4. Calculate statistics per region
+    # Group by region name and sum the revenue
+
+    # Dictionary to store results before merging
+    stats_list = []
+
+    # A. Calculate Total (All dealers regardless of vertical)
+    total_stats = df_joined.groupby(geo_key_col)['actual_revenue'].sum().reset_index()
+    total_stats.columns = [geo_key_col, 'Total_actual_dealer_revenue']
+    stats_list.append(total_stats)
+
+    # B. Calculate per Vertical
+    for vertical in config['vertical']:
+        # Filter dealers where this specific vertical is True
+        v_mask = df_joined[vertical] == True
+        v_stats = df_joined[v_mask].groupby(geo_key_col)['actual_revenue'].sum().reset_index()
+
+        # Rename column to match your target_col format: f'{selected_vertical}_actual_dealer_revenue'
+        v_stats.columns = [geo_key_col, f'{vertical}_actual_dealer_revenue']
+        stats_list.append(v_stats)
+
+    # 5. Merge results to the region dataframe
+    # This adds the calculated revenue as a new column in gdf_region
+
+    # Copy and filter region dataframe
+    df_region = data_region.df.copy()
+    df_region = df_region[df_region['country'] == str(selected_country['name'])]
+
+    # Merge results
+    for stat in stats_list:
+        left_key = 'region'
+
+        df_region = df_region.merge(
+            stat,
+            left_on=left_key,
+            right_on=geo_key_col,
+            how='left'
+        )
+
+        # IMPORTANT: Drop the redundant key column from the right side immediately
+        # to prevent 'NAME_1_x' or 'NAME_1_y' conflicts in the next iteration
+        if left_key != geo_key_col and geo_key_col in df_region.columns:
+            df_region = df_region.drop(columns=[geo_key_col])
+
+    # 6. Fill missing values for regions with no dealers
+    revenue_cols = [col for col in df_region.columns if 'actual_dealer_revenue' in col]
+    df_region[revenue_cols] = df_region[revenue_cols].fillna(0)
 
 
 ##############
@@ -351,26 +420,27 @@ with col1:
 
     if geojson is not None and not geojson.empty:
 
-        # Copy DataFrame for dynamic scaling
-        temp_df = data_region.df.copy()
+        ### Dynamic scaling
         target_col = f'{selected_heatmap_vertical}_{selected_heatmap_value["value"]}'
 
         # Get divisor
-        max_value = temp_df[target_col].max()
+        max_value = df_region[target_col].max()
         divisor, unit = get_divisor(max_value)
 
         # Scale data
-        temp_df[target_col] = temp_df[target_col] / divisor
+        df_region[target_col] = df_region[target_col] / divisor
 
         # Generate legend
         dynamic_legend_name = f"{selected_heatmap_value['name']} ({selected_heatmap_vertical}) (Unit: {unit}$)"
 
         # Draw heatmap
+        target_col = f'{selected_heatmap_vertical}_{selected_heatmap_value["value"]}'
+
         choropleth = folium.Choropleth(
             geo_data=geojson.to_json(),
-            data=temp_df,
-            columns=['region', f'{selected_heatmap_vertical}_{selected_heatmap_value["value"]}'],
-            key_on='feature.properties.NAME_1' if is_level_1 else 'feature.properties.GID_0',
+            data=df_region,
+            columns=['region', target_col],
+            key_on=f'feature.properties.{geo_key_col}',
             fill_color='YlOrRd', # Yellow-Orange-Red
             fill_opacity=0.6,
             line_opacity=0.2,
@@ -379,7 +449,7 @@ with col1:
         ).add_to(m)
 
         choropleth.geojson.add_child(
-            folium.GeoJsonTooltip(fields=['NAME_1' if is_level_1 else 'GID_0'], aliases=['Region:'])
+            folium.GeoJsonTooltip(fields=[geo_key_col], aliases=['Region:'])
         )
 
         # Center map to fit region
@@ -430,20 +500,14 @@ with col2:
                 panel_dealer.draw(st.session_state.selected_dealer)
 
             elif st.session_state.get('click_type') == 'region':
-                ### Filter for info panel
-                df_filtered_dealer_info_panel = data_dealer.df
-
-                # Vertical
-                if selected_heatmap_vertical != 'Total':
-                    df_filtered_dealer_info_panel = data_dealer.df[data_dealer.df[selected_heatmap_vertical]]
-
-                # Country
-                df_filtered_dealer_info_panel = filter_by_geometry(df_filtered_dealer_info_panel,
+                # Region
+                df_filtered_dealer_info_panel = filter_by_geometry(df_filtered_dealer_heatmap,
                                                                    geojson,
                                                                    st.session_state.selected_region)
 
-                ### Draw
+                # Draw
                 panel_region.draw(
+                    df_region,
                     country = selected_country['name'],
                     vertical = selected_heatmap_vertical,
                     region = st.session_state.selected_region,
@@ -452,20 +516,14 @@ with col2:
 
         else:
             if selected_country['name'] != 'All':
-                ### Filter for info panel
-                df_filtered_dealer_info_panel = data_dealer.df
-
-                # Vertical
-                if selected_heatmap_vertical != 'Total':
-                    df_filtered_dealer_info_panel = data_dealer.df[data_dealer.df[selected_heatmap_vertical]]
-
-                # Country
-                df_filtered_dealer_info_panel = filter_by_geometry(df_filtered_dealer_info_panel,
+                # Region
+                df_filtered_dealer_info_panel = filter_by_geometry(df_filtered_dealer_heatmap,
                                                                    geojson,
                                                                    st.session_state.selected_region)
 
-                ### Draw
+                # Draw
                 panel_region.draw(
+                    df_region,
                     country = selected_country['name'],
                     vertical = selected_heatmap_vertical,
                     df_filtered_dealers = df_filtered_dealer_info_panel

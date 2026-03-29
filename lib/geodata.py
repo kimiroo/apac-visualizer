@@ -75,7 +75,11 @@ class GeoData:
             except Exception:
                 return None
 
-def filter_by_geometry(dataframe: pd.DataFrame | gpd.GeoDataFrame, country_gdf: gpd.GeoDataFrame, region: str | None = None) -> gpd.GeoDataFrame:
+def filter_by_geometry(
+        dataframe: pd.DataFrame | gpd.GeoDataFrame,
+        country_gdf: gpd.GeoDataFrame,
+        region: str | None = None
+    ) -> gpd.GeoDataFrame:
     """Filters a DataFrame of points by a geographic boundary.
 
     Args:
@@ -98,6 +102,14 @@ def filter_by_geometry(dataframe: pd.DataFrame | gpd.GeoDataFrame, country_gdf: 
         target_boundary = country_gdf[country_gdf['NAME_1'] == region]
     else:
         target_boundary = country_gdf
+
+    # Drop 'index_right' if it already exists to prevent ValueError during sjoin
+    if 'index_right' in gdf.columns:
+        gdf = gdf.drop(columns=['index_right'])
+
+    # Also ensure target_boundary does not contain 'index_right'
+    if 'index_right' in target_boundary.columns:
+        target_boundary = target_boundary.drop(columns=['index_right'])
 
     # Spatial Join
     filtered_by_geo = gpd.sjoin(gdf, target_boundary, predicate='within')

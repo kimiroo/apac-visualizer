@@ -11,7 +11,7 @@ from lib.pie_chart import pie_chart_with_percentage
 class RegionPanel:
     """Handles the rendering of the region details panel in the Streamlit app."""
 
-    def __init__(self, df_dealer: pd.DataFrame, df_key_account: pd.DataFrame, config: dict) -> None:
+    def __init__(self, config: dict) -> None:
         """Initializes the RegionPanel.
 
         Args:
@@ -19,12 +19,11 @@ class RegionPanel:
             df_key_account (pd.DataFrame): The dataframe containing key account information.
             config (dict): Application configuration dictionary.
         """
-        self._df_d: pd.DataFrame = df_dealer
-        self._df_k: pd.DataFrame = df_key_account
         self._config: dict = config
         self._active_vertical = GetActiveVerticalString(self._config)
 
     def draw(self,
+             df_region: pd.DataFrame,
              country: str,
              vertical: str,
              region: str | None = None,
@@ -38,20 +37,10 @@ class RegionPanel:
             df_filtered_dealers (pd.DataFrame, optional): Filtered dataframe of dealers. Defaults to None.
         """
 
-        ### Data Filtering
-
-        # Create filter mask
-        mask_data = (self._df_d['country'] == str(country))
-
+        # Filter region if region is selected
+        data = df_region
         if region:
-            mask_data &= (self._df_d['region'] == str(region))
-
-        # Filter data
-        data = self._df_d[mask_data]
-
-        if data.empty:
-            st.warning('No data found for this region.')
-            return
+            data = data[data['region'] == region]
 
         # Select a row if it's region, or sum rows if it's country
         row = data.iloc[0] if region else data.sum(numeric_only=True)
@@ -75,7 +64,7 @@ class RegionPanel:
 
         with col1:
             total_prj_rev = row[f'{vertical}_total_market_value']
-            dealer_cnt = row[f'{vertical}_dealer_cnt']
+            dealer_cnt = 0 #row[f'{vertical}_dealer_cnt']
 
             st.metric(label='Total Market Value', value=f'${millify(total_prj_rev, precision=1)}')
             st.metric(label='Dealer Count', value=dealer_cnt)
