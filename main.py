@@ -456,8 +456,11 @@ with col1:
         max_value = df_region[target_col].max()
         divisor, unit = get_divisor(max_value)
 
+        # Copy dataframe
+        df_region_heatmap = df_region.copy()
+
         # Scale data
-        df_region[target_col] = df_region[target_col] / divisor
+        df_region_heatmap[target_col] = df_region_heatmap[target_col] / divisor
 
         # Generate legend
         dynamic_legend_name = f"{selected_heatmap_value['name']} ({selected_heatmap_vertical}) (Unit: {unit}$)"
@@ -467,7 +470,7 @@ with col1:
 
         choropleth = folium.Choropleth(
             geo_data=geojson.to_json(),
-            data=df_region,
+            data=df_region_heatmap,
             columns=['region', target_col],
             key_on=f'feature.properties.{geo_key_col}',
             fill_color='YlOrRd', # Yellow-Orange-Red
