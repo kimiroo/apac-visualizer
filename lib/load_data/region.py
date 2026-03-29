@@ -28,7 +28,7 @@ class RegionData:
         ### Parse header
         headers = {}
 
-        extra_headers = ['Others', 'Total']
+        extra_headers = ['Total']
 
         col_start_idx = 2
         col_vertical = None

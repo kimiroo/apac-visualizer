@@ -168,7 +168,7 @@ st.sidebar.header('Heatmap')
 selected_heatmap_vertical = st.sidebar.selectbox(
     'Vertical',
     key='selected_heatmap_vertical',
-    options=['Total'] + config['vertical'] + ['Others']
+    options=['Total'] + config['vertical']
 )
 
 st.sidebar.caption("💡 Tip: 'Vertical' filter also applies to the Dealer list in the right info panel.")
@@ -271,34 +271,71 @@ selected_column_ratio = st.sidebar.selectbox(
 geojson, is_level_1 = gd.get_geojson(selected_country['code'])
 
 ### Shallow copy DataFrames
-df_filtered_dealer_map_panel = data_dealer.df.copy()
-df_filtered_key_account_map_panel = data_key_account.df.copy()
+df_filtered_dealer_map_pins = data_dealer.df.copy()
+df_filtered_key_account_map_pins = data_key_account.df.copy()
+df_filtered_dealer_heatmap = data_dealer.df.copy()
+df_filtered_key_account_heatmap = data_key_account.df.copy()
 
 ### Filter country
 if geojson is not None and not geojson.empty:
-    df_filtered_dealer_map_panel = filter_by_geometry(df_filtered_dealer_map_panel, geojson)
-    df_filtered_key_account_map_panel = filter_by_geometry(df_filtered_key_account_map_panel, geojson)
+    df_filtered_dealer_map_pins = filter_by_geometry(df_filtered_dealer_map_pins, geojson)
+    df_filtered_key_account_map_pins = filter_by_geometry(df_filtered_key_account_map_pins, geojson)
+    df_filtered_dealer_heatmap = df_filtered_dealer_map_pins.copy()
+    df_filtered_key_account_heatmap = df_filtered_key_account_map_pins.copy()
 
 
 ### Filter vertical
-df_filtered_dealer_map_panel = filter_by_vertical(
-    df_filtered_dealer_map_panel,
+df_filtered_dealer_map_pins = filter_by_vertical(
+    df_filtered_dealer_map_pins,
     selected_verticals_dealer,
     config['vertical']
 )
-df_filtered_key_account_map_panel = filter_by_vertical(
-    df_filtered_key_account_map_panel,
+df_filtered_key_account_map_pins = filter_by_vertical(
+    df_filtered_key_account_map_pins,
     selected_verticals_key_account,
+    config['vertical']
+)
+df_filtered_dealer_heatmap = filter_by_vertical(
+    df_filtered_dealer_heatmap,
+    [],
+    config['vertical']
+)
+df_filtered_key_account_heatmap = filter_by_vertical(
+    df_filtered_key_account_heatmap,
+    [],
     config['vertical']
 )
 
 ### Filter tier (Dealer)
-df_filtered_dealer_map_panel = df_filtered_dealer_map_panel[df_filtered_dealer_map_panel['tier'].isin(selected_tiers_dealer)]
+df_filtered_dealer_map_pins = df_filtered_dealer_map_pins[df_filtered_dealer_map_pins['tier'].isin(selected_tiers_dealer)]
 
 
 ### Filter customer status (Plant)
 selected_is_customer_key_account_values = [obj['value'] for obj in selected_is_customer_key_account]
-df_filtered_key_account_map_panel = df_filtered_key_account_map_panel[df_filtered_key_account_map_panel['is_customer'].isin(selected_is_customer_key_account_values)]
+df_filtered_key_account_map_pins = df_filtered_key_account_map_pins[df_filtered_key_account_map_pins['is_customer'].isin(selected_is_customer_key_account_values)]
+
+
+### Filter dealer, key account pin if region is selected
+if st.session_state.get('selected_region'):
+    # Workaround for 'index_right' cannot be a column name in the frames being joined
+    df_filtered_dealer_map_pins = df_filtered_dealer_map_pins.drop(['index_right'], axis=1)
+    df_filtered_key_account_map_pins = df_filtered_key_account_map_pins.drop(['index_right'], axis=1)
+
+    df_filtered_dealer_map_pins = filter_by_geometry(df_filtered_dealer_map_pins,
+                                                      geojson,
+                                                      st.session_state.selected_region)
+    df_filtered_key_account_map_pins = filter_by_geometry(df_filtered_key_account_map_pins,
+                                                           geojson,
+                                                           st.session_state.selected_region)
+
+
+########################
+### Number Crunching ###
+########################
+
+### Dealer Count calculation
+
+
 
 
 ##############
@@ -352,22 +389,9 @@ with col1:
 
         m.fit_bounds([sw, ne])
 
-    # Filter dealer, key account pin if region is selected
-    if st.session_state.get('selected_region'):
-        # Workaround for 'index_right' cannot be a column name in the frames being joined
-        df_filtered_dealer_map_panel = df_filtered_dealer_map_panel.drop(['index_right'], axis=1)
-        df_filtered_key_account_map_panel = df_filtered_key_account_map_panel.drop(['index_right'], axis=1)
-
-        df_filtered_dealer_map_panel = filter_by_geometry(df_filtered_dealer_map_panel,
-                                                          geojson,
-                                                          st.session_state.selected_region)
-        df_filtered_key_account_map_panel = filter_by_geometry(df_filtered_key_account_map_panel,
-                                                               geojson,
-                                                               st.session_state.selected_region)
-
     # Draw dealer pins
     if draw_dealers_pin:
-        for _, row in df_filtered_dealer_map_panel.iterrows():
+        for _, row in df_filtered_dealer_map_pins.iterrows():
             # Check for NaN coordinates to avoid errors
             if pd.notnull(row['lat']) and pd.notnull(row['long']):
                 folium.Marker(
@@ -380,7 +404,7 @@ with col1:
 
     # Draw key account pins
     if draw_key_account_pin:
-        for _, row in df_filtered_key_account_map_panel.iterrows():
+        for _, row in df_filtered_key_account_map_pins.iterrows():
             # Check for NaN coordinates to avoid errors
             if pd.notnull(row['lat']) and pd.notnull(row['long']):
                 folium.Marker(
@@ -411,10 +435,7 @@ with col2:
 
                 # Vertical
                 if selected_heatmap_vertical != 'Total':
-                    if selected_heatmap_vertical == 'Others':
-                        df_filtered_dealer_info_panel = data_dealer.df.iloc[0:0]
-                    else:
-                        df_filtered_dealer_info_panel = data_dealer.df[data_dealer.df[selected_heatmap_vertical]]
+                    df_filtered_dealer_info_panel = data_dealer.df[data_dealer.df[selected_heatmap_vertical]]
 
                 # Country
                 df_filtered_dealer_info_panel = filter_by_geometry(df_filtered_dealer_info_panel,
@@ -436,10 +457,7 @@ with col2:
 
                 # Vertical
                 if selected_heatmap_vertical != 'Total':
-                    if selected_heatmap_vertical == 'Others':
-                        df_filtered_dealer_info_panel = data_dealer.df.iloc[0:0]
-                    else:
-                        df_filtered_dealer_info_panel = data_dealer.df[data_dealer.df[selected_heatmap_vertical]]
+                    df_filtered_dealer_info_panel = data_dealer.df[data_dealer.df[selected_heatmap_vertical]]
 
                 # Country
                 df_filtered_dealer_info_panel = filter_by_geometry(df_filtered_dealer_info_panel,

@@ -62,7 +62,7 @@ class RegionPanel:
         else:
             st.subheader(f'📍 Country: {country} ({vertical})')
 
-        verticals = self._config['vertical'] + ['Others', 'Total']
+        verticals = self._config['vertical'] + ['Total']
         show_pie_chart = True
 
         if vertical != 'Total':
@@ -137,7 +137,7 @@ class RegionPanel:
         if show_pie_chart:
             st.write('##### 📊 Market Weightage')
 
-            verticals_no_total = self._config['vertical'] + ['Others']
+            verticals_no_total = self._config['vertical']
 
             # Prepare data specifically for the pie chart
             plot_share = []
