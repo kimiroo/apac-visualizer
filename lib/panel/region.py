@@ -24,10 +24,11 @@ class RegionPanel:
 
     def draw(self,
              df_region: pd.DataFrame,
+             df_dealers: pd.DataFrame,
+             df_key_accounts: pd.DataFrame,
              country: str,
              vertical: str,
-             region: str | None = None,
-             df_filtered_dealers: pd.DataFrame | None = None) -> None:
+             region: str | None = None) -> None:
         """Renders the region information panel.
 
         Args:
@@ -37,7 +38,6 @@ class RegionPanel:
             df_filtered_dealers (pd.DataFrame, optional): Filtered dataframe of dealers. Defaults to None.
         """
 
-        # Filter region if region is selected
         data = df_region
         if region:
             data = data[data['region'] == region]
@@ -52,6 +52,7 @@ class RegionPanel:
             st.subheader(f'📍 Country: {country} ({vertical})')
 
         verticals = self._config['vertical'] + ['Total']
+        v_cols = self._config['vertical']
         show_pie_chart = True
 
         if vertical != 'Total':
@@ -64,7 +65,7 @@ class RegionPanel:
 
         with col1:
             total_prj_rev = row[f'{vertical}_total_market_value']
-            dealer_cnt = 0 #row[f'{vertical}_dealer_cnt']
+            dealer_cnt = len(df_dealers)
 
             st.metric(label='Total Market Value', value=f'${millify(total_prj_rev, precision=1)}')
             st.metric(label='Dealer Count', value=dealer_cnt)
@@ -78,27 +79,28 @@ class RegionPanel:
 
 
         ### Actual (vs Projected) Dealer Revenue
-        st.write('##### 📊 Dealer Revenue')
+        if vertical == 'Total' or self._config['showOptionalData']['projectedRevenue']:
+            st.write('##### 📊 Dealer Revenue')
 
-        # Create a long-form dataframe for Altair
-        plot_revenue = []
-        for v in verticals:
+            # Create a long-form dataframe for Altair
+            plot_revenue = []
+            for v in verticals:
 
-            if self._config['showOptionalData']['projectedRevenue']:
-                plot_revenue.append({'Vertical': v, 'Type': 'Projected', 'Value': row[f'{v}_projected_dealer_revenue']})
+                if self._config['showOptionalData']['projectedRevenue']:
+                    plot_revenue.append({'Vertical': v, 'Type': 'Projected', 'Value': row[f'{v}_projected_dealer_revenue']})
 
-            plot_revenue.append({'Vertical': v, 'Type': 'Actual', 'Value': row[f'{v}_actual_dealer_revenue']})
+                plot_revenue.append({'Vertical': v, 'Type': 'Actual', 'Value': row[f'{v}_actual_dealer_revenue']})
 
-        df_revenue = pd.DataFrame(plot_revenue)
+            df_revenue = pd.DataFrame(plot_revenue)
 
-        chart_revenue = grouped_bar_chart(
-            df_revenue,
-            ('Vertical:N', 'Verticals'), # X-Axis config
-            ('Value:Q', 'Value'),        # Y-Axis config
-            '$,.2f'
-        )
+            chart_revenue = grouped_bar_chart(
+                df_revenue,
+                ('Vertical:N', 'Verticals'), # X-Axis config
+                ('Value:Q', 'Value'),        # Y-Axis config
+                '$,.2f'
+            )
 
-        st.altair_chart(chart_revenue, width='stretch')
+            st.altair_chart(chart_revenue, width='stretch')
 
 
         ### Potential vs Actual Market Value
@@ -146,23 +148,21 @@ class RegionPanel:
                 st.warning('No data to display')
 
 
-        ### Filtered Dealers
+        ### Dealers
         st.write(f'##### 🤝 Dealer list (Vertical: {vertical})')
 
-        v_cols = self._config['vertical']
+        df_dealers_display = df_dealers[['id', 'name', 'tier', 'profile', 'address']].copy()
+        df_dealers_display['vertical'] = df_dealers[v_cols].apply(self._active_vertical.get, axis=1)
 
-        display_df = df_filtered_dealers[['id', 'name', 'tier', 'profile', 'location']].copy()
-        display_df['Vertical'] = df_filtered_dealers[v_cols].apply(self._active_vertical.get, axis=1)
-
-        display_df.columns = ['ID', 'Name', 'Tier', 'Profile', 'Location', 'Vertical']
+        df_dealers_display.columns = ['ID', 'Name', 'Tier', 'Profile', 'Address', 'Vertical']
 
         # Reset index and convert to human-friendly numbering
-        display_df = display_df.reset_index(drop=True)
-        display_df.index = display_df.index + 1
+        df_dealers_display = df_dealers_display.reset_index(drop=True)
+        df_dealers_display.index = df_dealers_display.index + 1
 
         # Draw
         st.dataframe(
-            display_df,
+            df_dealers_display,
             on_select='ignore',
             width='content',
             column_config={
@@ -170,7 +170,7 @@ class RegionPanel:
                 'Name': st.column_config.TextColumn('Name', width='medium'),
                 'Tier': st.column_config.TextColumn('Tier', width='small'),
                 'Profile': st.column_config.TextColumn('Profile', width=150),
-                'Location': st.column_config.TextColumn('Location', width='medium'),
+                'Address': st.column_config.TextColumn('Address', width='medium'),
                 'Vertical': st.column_config.TextColumn('Vertical', width='large')
             }
         )
@@ -179,31 +179,31 @@ class RegionPanel:
 
 
         ### Key Accounts
-        st.write(f'##### ❤️ Key Account')
+        st.write(f'##### ❤️ Key Account list (Vertical: {vertical})')
 
-        # Create filter mask
-#        mask_k = (self._df_k['country'] == str(country))
-#
-#        if region:
-#            mask_k &= (self._df_k['region'] == str(region))
-#
-#        # Filter data
-#        key_account = self._df_k[mask_k]
-#
-#        # Refine data
-#        key_account = key_account[['name', 'vertical']].copy()
-#        key_account.columns = ['Name', 'Vertical']
-#
-#        # Reset index and convert to human-friendly numbering
-#        key_account = key_account.reset_index(drop=True)
-#        key_account.index = key_account.index + 1
-#
-#        # Draw
-#        st.dataframe(
-#            key_account,
-#            on_select='ignore',
-#            width='content',
-#        )
+        df_key_account_display = df_key_accounts[['id', 'name', 'address']]
+        df_key_account_display['vertical'] = df_key_accounts[v_cols].apply(self._active_vertical.get, axis=1)
+
+        df_key_account_display.columns = ['ID', 'Name', 'Address', 'Vertical']
+
+        # Reset index and convert to human-friendly numbering
+        df_key_account_display = df_key_account_display.reset_index(drop=True)
+        df_key_account_display.index = df_key_account_display.index + 1
+
+        # Draw
+        st.dataframe(
+            df_key_account_display,
+            on_select='ignore',
+            width='content',
+            column_config={
+                'ID': st.column_config.TextColumn('ID', width=100),
+                'Name': st.column_config.TextColumn('Name', width='medium'),
+                'Address': st.column_config.TextColumn('Address', width='medium'),
+                'Vertical': st.column_config.TextColumn('Vertical', width='large')
+            }
+        )
+
+        st.caption("💡 Tip: This table is affected by 'Vertical' filter under 'Heatmap'.")
 
         ### Remarks
         if region:

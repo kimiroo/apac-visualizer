@@ -65,7 +65,7 @@ class DealerPanel:
             ('Name', row['name']),
             ('Tier', row['tier']),
             ('Profile', row['profile']),
-            ('Location', row['location']),
+            ('Address', row['address']),
             ('Actual Revenue', row['actual_revenue']),
             ('Projected Revenue', row['projected_revenue']),
             ('Verticals', active_vertical_string)

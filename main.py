@@ -333,6 +333,8 @@ if st.session_state.get('selected_region'):
 
 if geojson is not None and not geojson.empty:
 
+    ### Automatic Actual Dealer Revenue calculation
+
     # 1. Convert to GeoDataFrame
     gdf_dealer_heatmap = gpd.GeoDataFrame(
         df_filtered_dealer_heatmap,
@@ -405,6 +407,22 @@ if geojson is not None and not geojson.empty:
     # 6. Fill missing values for regions with no dealers
     revenue_cols = [col for col in df_region.columns if 'actual_dealer_revenue' in col]
     df_region[revenue_cols] = df_region[revenue_cols].fillna(0)
+
+    ### Additional filtering for region panel
+    df_dealers_info_panel = df_filtered_dealer_heatmap.copy()
+    df_key_account_info_panel = df_filtered_key_account_heatmap.copy()
+
+    if st.session_state.get('click_type') == 'region':
+        df_dealers_info_panel = filter_by_geometry(
+            df_dealers_info_panel,
+            geojson,
+            st.session_state.selected_region
+        )
+        df_key_account_info_panel = filter_by_geometry(
+            df_key_account_info_panel,
+            geojson,
+            st.session_state.selected_region
+        )
 
 
 ##############
@@ -508,10 +526,11 @@ with col2:
                 # Draw
                 panel_region.draw(
                     df_region,
+                    df_dealers_info_panel,
+                    df_key_account_info_panel,
                     country = selected_country['name'],
                     vertical = selected_heatmap_vertical,
                     region = st.session_state.selected_region,
-                    df_filtered_dealers = df_filtered_dealer_info_panel
                 )
 
         else:
@@ -524,9 +543,10 @@ with col2:
                 # Draw
                 panel_region.draw(
                     df_region,
+                    df_dealers_info_panel,
+                    df_key_account_info_panel,
                     country = selected_country['name'],
                     vertical = selected_heatmap_vertical,
-                    df_filtered_dealers = df_filtered_dealer_info_panel
                 )
             else:
                 st.info('Click a pin on the map to see details.')

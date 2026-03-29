@@ -45,7 +45,7 @@ class DealerData:
         columns_dealer = [
             'area', 'country', 'sales_org',
             'id', 'name', 'tier', 'profile', 'remarks',
-            'location', 'lat', 'long',
+            'address', 'lat', 'long',
             'projected_revenue', 'actual_revenue'
         ]
 
