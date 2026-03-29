@@ -43,8 +43,9 @@ class KeyAccountData:
 
         # Dynamically set extra columns
         columns_key_account = [
-            'area', 'country', 'region', 'remarks',
-            'id', 'name', 'address', 'lat', 'long',
+            'area', 'country', 'region',
+            'id', 'name', 'address', 'remarks',
+            'lat', 'long',
             'value', 'water_consumption', 'is_customer'
         ]
 

@@ -22,6 +22,7 @@ from lib.load_data.key_account import KeyAccountData
 from lib.load_data.dealer import DealerData
 from lib.load_data.region import RegionData
 from lib.panel.dealer import DealerPanel
+from lib.panel.key_account import KeyAccountPanel
 from lib.panel.region import RegionPanel
 
 # code by me
@@ -96,6 +97,7 @@ geometry = [Point(xy) for xy in zip(data_dealer.df['long'], data_dealer.df['lat'
 data_dealer.df = gpd.GeoDataFrame(data_dealer.df, geometry=geometry, crs="EPSG:4326")
 
 panel_dealer = DealerPanel(data_dealer.df, config)
+panel_key_account = KeyAccountPanel(data_key_account.df, config)
 panel_region = RegionPanel(config)
 
 
@@ -109,6 +111,9 @@ if 'click_type' not in st.session_state:
 
 if 'selected_dealer' not in st.session_state:
     st.session_state.selected_dealer = None
+
+if 'selected_key_account' not in st.session_state:
+    st.session_state.selected_key_account = None
 
 if 'selected_region' not in st.session_state:
     st.session_state.selected_region = None
@@ -124,9 +129,10 @@ def sync_click_state(map_data):
     click_type, obj_name = parse_click(last_tooltip)
 
     is_same_dealer = (click_type == 'dealer' and st.session_state.get('selected_dealer') == obj_name)
+    is_same_key_account = (click_type == 'key_account' and st.session_state.get('selected_key_account') == obj_name)
     is_same_region = (click_type == 'region' and st.session_state.get('selected_region') == obj_name)
 
-    if st.session_state.get('click_type') == click_type and (is_same_dealer or is_same_region):
+    if st.session_state.get('click_type') == click_type and (is_same_dealer or is_same_region or is_same_key_account):
         return
 
     # Store states to session state
@@ -134,6 +140,9 @@ def sync_click_state(map_data):
 
     if click_type == 'dealer':
         st.session_state.selected_dealer = obj_name
+
+    elif click_type == 'key_account':
+        st.session_state.selected_key_account = obj_name
 
     elif click_type == 'region':
         st.session_state.selected_region = obj_name
@@ -157,6 +166,7 @@ selected_country = st.sidebar.selectbox(
 if st.sidebar.button('Clear selection'):
     st.session_state.click_type = None
     st.session_state.selected_dealer = None
+    st.session_state.selected_key_account = None
     st.session_state.selected_region = None
     st.rerun()
 
@@ -497,7 +507,7 @@ with col1:
             if pd.notnull(row['lat']) and pd.notnull(row['long']):
                 folium.Marker(
                     location=[row['lat'], row['long']],
-                    tooltip=f'''<b>Dealer:</b> {row['name']} ({row['id']})<br>
+                    tooltip=f'''<b>Key Account:</b> {row['name']} ({row['id']})<br>
                                 Value: ${row['value']:,.2f}''',
                     icon=folium.Icon(color=is_customer_color_map.get(row['is_customer'], 'black'), icon='industry', prefix='fa')
                 ).add_to(m)
@@ -517,12 +527,10 @@ with col2:
             if st.session_state.get('click_type') == 'dealer':
                 panel_dealer.draw(st.session_state.selected_dealer)
 
-            elif st.session_state.get('click_type') == 'region':
-                # Region
-                df_filtered_dealer_info_panel = filter_by_geometry(df_filtered_dealer_heatmap,
-                                                                   geojson,
-                                                                   st.session_state.selected_region)
+            elif st.session_state.get('click_type') == 'key_account':
+                panel_key_account.draw(st.session_state.selected_key_account)
 
+            elif st.session_state.get('click_type') == 'region':
                 # Draw
                 panel_region.draw(
                     df_region,
@@ -535,11 +543,6 @@ with col2:
 
         else:
             if selected_country['name'] != 'All':
-                # Region
-                df_filtered_dealer_info_panel = filter_by_geometry(df_filtered_dealer_heatmap,
-                                                                   geojson,
-                                                                   st.session_state.selected_region)
-
                 # Draw
                 panel_region.draw(
                     df_region,
