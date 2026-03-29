@@ -260,17 +260,24 @@ selected_is_customer_key_account = st.sidebar.multiselect(
 # View
 st.sidebar.header('View')
 
-column_ratio_options = [
-    {'name': '7:3', 'value': [7, 3]},
-    {'name': '5:5', 'value': [5, 5]},
-    {'name': '3:7', 'value': [3, 7]}
-]
-
-selected_column_ratio = st.sidebar.selectbox(
-    'Split Ratio',
+selected_column_ratio = st.sidebar.slider(
+    'Column Width Ratio',
     key='selected_column_ratio',
-    options=column_ratio_options,
-    format_func=lambda x: x['name']
+    min_value=1,
+    max_value=9,
+    step=1,
+    value=7,
+    help='Adjust the width balance between the left and right columns (Total scale of 10).'
+)
+
+selected_view_height = st.sidebar.slider(
+    'View Height',
+    key='selected_view_height',
+    min_value=300,
+    max_value=2000,
+    step=100,
+    value=700,
+    help='Set the vertical height of the content container in pixels.'
 )
 
 
@@ -441,7 +448,11 @@ if geojson is not None and not geojson.empty:
 ##############
 
 # Create two columns: Map (Left) and Information (Right)
-col1, col2 = st.columns(selected_column_ratio['value'])
+total_weight = 10
+col1_weight = selected_column_ratio
+col2_weight = total_weight - selected_column_ratio
+
+col1, col2 = st.columns([col1_weight, col2_weight])
 
 with col1:
     # Initialize Folium Map
@@ -521,14 +532,19 @@ with col1:
                 ).add_to(m)
 
     # Display Map and Capture User Interaction
-    map_data = st_folium(m, width='100%', height=900)
+    map_data = st_folium(
+        m,
+        width='100%',
+        height=selected_view_height,
+        key=f'_dummy_map_height_{selected_view_height}' # Workaround: Use 'key' to force-refresh
+    )
 
     # Sync click state
     sync_click_state(map_data)
 
 with col2:
     # Make column scrollable
-    with st.container(height=900):
+    with st.container(height=selected_view_height):
 
         # Check if a user clicked a region or a point
         if st.session_state.get('click_type'):
