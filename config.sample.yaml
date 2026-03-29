@@ -16,6 +16,8 @@ vertical:
   - Chemical/Pharma
   - Electronics
   - Mobility
+showOptionalData:
+  projectedRevenue: False
 tiers:
   - name: Elite
     color: orange
@@ -25,3 +27,8 @@ tiers:
     color: cadetblue
   - name: Probation
     color: lightgray
+isCustomer:
+  - value: True
+    color: green
+  - value: False
+    color: red
