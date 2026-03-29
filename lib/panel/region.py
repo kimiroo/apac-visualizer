@@ -75,7 +75,7 @@ class RegionPanel:
             plant_cnt = row[f'{vertical}_plant_cnt']
 
             st.metric(label='Potential Market Value', value=f'${millify(total_act_rev, precision=1).upper()}')
-            st.metric(label='Plant Count', value=plant_cnt)
+            st.metric(label='Plant Count', value=int(plant_cnt))
 
 
         ### Actual (vs Projected) Dealer Revenue

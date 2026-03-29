@@ -529,6 +529,7 @@ with col1:
 with col2:
     # Make column scrollable
     with st.container(height=900):
+
         # Check if a user clicked a region or a point
         if st.session_state.get('click_type'):
 
@@ -539,25 +540,23 @@ with col2:
                 panel_key_account.draw(st.session_state.selected_key_account)
 
             elif st.session_state.get('click_type') == 'region':
-                # Draw
                 panel_region.draw(
                     df_region,
                     df_dealers_info_panel,
                     df_key_account_info_panel,
                     country = selected_country['name'],
-                    vertical = selected_heatmap_vertical,
                     region = st.session_state.selected_region,
+                    vertical = selected_heatmap_vertical
                 )
 
         else:
             if selected_country['name'] != 'All':
-                # Draw
                 panel_region.draw(
                     df_region,
                     df_dealers_info_panel,
                     df_key_account_info_panel,
                     country = selected_country['name'],
-                    vertical = selected_heatmap_vertical,
+                    vertical = selected_heatmap_vertical
                 )
             else:
                 st.info('Click a pin on the map to see details.')
