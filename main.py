@@ -18,6 +18,7 @@ from lib.get_divisor import get_divisor
 from lib.click_parser import parse_click
 from lib.geodata import GeoData, filter_by_geometry
 from lib.filter_vertical import filter_by_vertical
+from lib.format_helper import format_currency
 from lib.load_data.key_account import KeyAccountData
 from lib.load_data.dealer import DealerData
 from lib.load_data.region import RegionData
@@ -490,13 +491,17 @@ with col1:
     # Draw dealer pins
     if draw_dealers_pin:
         for _, row in df_filtered_dealer_map_pins.iterrows():
+            tooltip = f'''<b>Dealer:</b> {row['name']} ({row['id']})<br>
+                          Actual Revenue: {format_currency(row['actual_revenue'])}'''
+
+            if config['showOptionalData']['projectedRevenue']:
+                tooltip += f'<br>Projected Revenue: {format_currency(row['projected_revenue'])}'
+
             # Check for NaN coordinates to avoid errors
             if pd.notnull(row['lat']) and pd.notnull(row['long']):
                 folium.Marker(
                     location=[row['lat'], row['long']],
-                    tooltip=f'''<b>Dealer:</b> {row['name']} ({row['id']})<br>
-                                Actual Revenue: ${row['actual_revenue']:,.2f}<br>
-                                Projected Revenue: ${row['projected_revenue']:,.2f}''',
+                    tooltip=tooltip,
                     icon=folium.Icon(color=tier_color_map.get(row['tier'], 'blue'), icon='briefcase', prefix='fa')
                 ).add_to(m)
 
@@ -508,7 +513,7 @@ with col1:
                 folium.Marker(
                     location=[row['lat'], row['long']],
                     tooltip=f'''<b>Key Account:</b> {row['name']} ({row['id']})<br>
-                                Value: ${row['value']:,.2f}''',
+                                Value: {format_currency(row['value'])}''',
                     icon=folium.Icon(color=is_customer_color_map.get(row['is_customer'], 'black'), icon='industry', prefix='fa')
                 ).add_to(m)
 
