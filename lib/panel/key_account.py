@@ -2,9 +2,9 @@
 
 import streamlit as st
 import pandas as pd
-import altair as alt
 
 from lib.get_active_verticals import GetActiveVerticalString
+from lib.format_helper import format_currency, format_number
 
 class KeyAccountPanel:
     """Handles the rendering of the key account details panel in the Streamlit app."""
@@ -49,8 +49,8 @@ class KeyAccountPanel:
             ('Name', row['name']),
             ('Address', row['address']),
             ('Is Customer', row['is_customer']),
-            ('Value', row['value']),
-            ('Water Consumption', row['water_consumption']),
+            ('Value', format_currency(row['value'])),
+            ('Water Consumption', format_number(row['water_consumption'], postfix=' L')),
             ('Verticals', active_vertical_string)
         ]
 

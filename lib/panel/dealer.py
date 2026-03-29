@@ -5,6 +5,7 @@ import pandas as pd
 import altair as alt
 
 from lib.get_active_verticals import GetActiveVerticalString
+from lib.format_helper import format_currency
 
 class DealerPanel:
     """Handles the rendering of the dealer details panel in the Streamlit app."""
@@ -66,8 +67,8 @@ class DealerPanel:
             ('Tier', row['tier']),
             ('Profile', row['profile']),
             ('Address', row['address']),
-            ('Actual Revenue', row['actual_revenue']),
-            ('Projected Revenue', row['projected_revenue']),
+            ('Actual Revenue', format_currency(row['actual_revenue'])),
+            ('Projected Revenue', format_currency(row['projected_revenue'])),
             ('Verticals', active_vertical_string)
         ]
 
