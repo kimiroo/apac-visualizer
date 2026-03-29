@@ -181,7 +181,7 @@ class RegionPanel:
         ### Key Accounts
         st.write(f'##### ❤️ Key Account list (Vertical: {vertical})')
 
-        df_key_account_display = df_key_accounts[['id', 'name', 'address']]
+        df_key_account_display = df_key_accounts[['id', 'name', 'address']].copy()
         df_key_account_display['vertical'] = df_key_accounts[v_cols].apply(self._active_vertical.get, axis=1)
 
         df_key_account_display.columns = ['ID', 'Name', 'Address', 'Vertical']
