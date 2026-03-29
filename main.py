@@ -280,6 +280,8 @@ selected_view_height = st.sidebar.slider(
     help='Set the vertical height of the content container in pixels.'
 )
 
+st.sidebar.caption("💡 Tip: Adjust 'View Height' to resize the map and info panel.")
+
 
 ##############
 ### Filter ###
