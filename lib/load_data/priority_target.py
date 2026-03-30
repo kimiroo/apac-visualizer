@@ -1,4 +1,4 @@
-"""Module for loading and processing key account data from Excel sheets."""
+"""Module for loading and processing priority target data from Excel sheets."""
 
 from typing import TYPE_CHECKING
 import pandas as pd
@@ -7,7 +7,7 @@ if TYPE_CHECKING:
     from openpyxl.workbook.workbook import _WorksheetOrChartsheetLike
 
 class PriorityTargetData:
-    """Manages the loading and structuring of key account information."""
+    """Manages the loading and structuring of priority target information."""
 
     def __init__(self, config: dict) -> None:
         """Initializes the KeyAccountData instance.
@@ -19,14 +19,14 @@ class PriorityTargetData:
         self._config = config
 
     def load(self, sheet: "_WorksheetOrChartsheetLike") -> None:
-        """Loads key account data from an Excel worksheet.
+        """Loads priority target data from an Excel worksheet.
 
         Args:
-            sheet (_WorksheetOrChartsheetLike): The Excel worksheet containing key account data.
+            sheet (_WorksheetOrChartsheetLike): The Excel worksheet containing priority target data.
         """
-        key_account_list = []
+        priority_target_list = []
 
-        # Load key account data
+        # Load priority target data
         headers = {cell.value: i for i, cell in enumerate(sheet[1])}
 
         for key_account in sheet.iter_rows(2):
@@ -39,7 +39,7 @@ class PriorityTargetData:
                     bool(key_account[headers[vertical]].value)
                 )
 
-            key_account_list.append(tuple(row_data))
+            priority_target_list.append(tuple(row_data))
 
         # Dynamically set extra columns
         columns_key_account = [
@@ -53,4 +53,4 @@ class PriorityTargetData:
             columns_key_account.append(vertical)
 
         # Convert to Pandas DataFrame
-        self.df = pd.DataFrame(key_account_list, columns=columns_key_account)
+        self.df = pd.DataFrame(priority_target_list, columns=columns_key_account)
