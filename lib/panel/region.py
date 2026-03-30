@@ -147,7 +147,7 @@ class RegionPanel:
 
 
         ### Dealers
-        st.write(f'##### 🤝 Dealer list (Vertical: {vertical})')
+        st.write(f'##### 🤝 Dealer List (Vertical: {vertical})')
 
         df_dealers_display = df_dealers[['id', 'name', 'tier', 'profile', 'actual_revenue', 'address']].copy()
         df_dealers_display['vertical'] = df_dealers[v_cols].apply(self._active_vertical.get, axis=1)
@@ -198,7 +198,7 @@ class RegionPanel:
 
 
         ### Priority Targets
-        st.write(f'##### ❤️ Priority Targets list (Vertical: {vertical})')
+        st.write(f'##### ❤️ Priority Targets List (Vertical: {vertical})')
 
         df_priority_target_display = df_priority_targets[['id', 'name', 'value', 'address']].copy()
         df_priority_target_display['vertical'] = df_priority_targets[v_cols].apply(self._active_vertical.get, axis=1)

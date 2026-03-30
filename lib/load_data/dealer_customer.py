@@ -1,7 +1,7 @@
 """Module for loading and processing dealer customer data from Excel sheets."""
 
 from typing import TYPE_CHECKING
-from datetime import datetime
+from datetime import datetime, date
 import pandas as pd
 
 if TYPE_CHECKING:
@@ -31,11 +31,11 @@ class DealerCustomerData:
         for dealer_customer in sheet.iter_rows(2):
 
             row_data = [
-                str(dealer_customer[0].value),      # Dealer ID
-                str(dealer_customer[2].value),      # Customer Name
-                float(dealer_customer[3].value),    # Sale Value
-                datetime(dealer_customer[4].value), # Sale Date
-                str(dealer_customer[5].value),      # Sale Model
+                str(dealer_customer[0].value),   # Dealer ID
+                str(dealer_customer[2].value),   # Customer Name
+                float(dealer_customer[3].value), # Sale Value
+                dealer_customer[4].value.date(), # Sale Date
+                str(dealer_customer[5].value),   # Sale Model
             ]
 
             dealer_customer_list.append(tuple(row_data))

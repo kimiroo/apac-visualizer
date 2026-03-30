@@ -10,14 +10,21 @@ from lib.format_helper import format_currency
 class DealerPanel:
     """Handles the rendering of the dealer details panel in the Streamlit app."""
 
-    def __init__(self, df_dealer: pd.DataFrame, config: dict) -> None:
+    def __init__(
+            self,
+            df_dealer: pd.DataFrame,
+            df_dealer_customer: pd.DataFrame,
+            config: dict
+        ) -> None:
         """Initializes the DealerPanel.
 
         Args:
             df_dealer (pd.DataFrame): The dataframe containing dealer information.
+            df_dealer_customer (pd.DataFrame): The dataframe containing dealer customer information.
             config (dict): Application configuration dictionary.
         """
-        self._df: pd.DataFrame = df_dealer
+        self._df_d: pd.DataFrame = df_dealer
+        self._df_c: pd.DataFrame = df_dealer_customer
         self._config: dict = config
         self._active_vertical = GetActiveVerticalString(self._config)
 
@@ -28,10 +35,10 @@ class DealerPanel:
             dealer_id (str): The unique identifier of the dealer to display.
         """
 
-        data = self._df[self._df['id'] == str(dealer_id)]
+        data = self._df_d[self._df_d['id'] == str(dealer_id)]
 
         if data.empty:
-            st.warning('No data found for this dealer.')
+            st.warning('Failed to load data for this dealer.')
             return
 
         row = data.iloc[0]
@@ -98,6 +105,38 @@ class DealerPanel:
             }
         )
 
+        ### Dealer Customer
+        st.write(f'##### ❤️ Dealer Customer List')
+
+        df_c = self._df_c.copy()
+        df_c = df_c[df_c['dealer_id'] == dealer_id]
+
+        df_c = df_c[['name', 'sale_value', 'sale_date', 'sale_model']].copy()
+
+        # Sort
+        df_c = df_c.sort_values(by=['sale_value'], ascending=False)
+
+        # Reset index and convert to human-friendly numbering
+        df_c = df_c.reset_index(drop=True)
+        df_c.index = df_c.index + 1
+
+        # Draw
+        st.dataframe(
+            df_c,
+            on_select='ignore',
+            width='content',
+            column_config={
+                'name': st.column_config.TextColumn('Name', width='medium'),
+                'sale_value': st.column_config.NumberColumn(
+                    'Sale Value',
+                    format='$%,.2f',
+                    width=150
+                ),
+                'sale_date': st.column_config.DateColumn('Sale Date'),
+                'sale_model': st.column_config.TextColumn('Sale Model', width='medium')
+            }
+        )
+
         ### Remarks
         st.write('##### 📌 Remarks')
 
@@ -107,4 +146,4 @@ class DealerPanel:
             st.info(f"{remarks_text}")
         else:
             # Placeholder when there are no remarks
-            st.warning('Failed to load data for this dealer.')
+            st.caption('No specific remarks available for this dealer.')

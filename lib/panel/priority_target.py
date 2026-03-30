@@ -30,7 +30,7 @@ class PriorityTargetPanel:
         data = self._df[self._df['id'] == str(priority_target_id)]
 
         if data.empty:
-            st.warning('No data found for this key account.')
+            st.warning('Failed to load data for this priority target.')
             return
 
         row = data.iloc[0]
@@ -81,4 +81,4 @@ class PriorityTargetPanel:
             st.info(f"{remarks_text}")
         else:
             # Placeholder when there are no remarks
-            st.warning('Failed to load data for this priority target.')
+            st.caption('No specific remarks available for this priority target.')
