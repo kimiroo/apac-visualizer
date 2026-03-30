@@ -95,7 +95,7 @@ def filter_by_geometry(
         gdf = dataframe
     else:
         geometry = [Point(xy) for xy in zip(dataframe['long'], dataframe['lat'])]
-        gdf = gpd.GeoDataFrame(dataframe, geometry=geometry, crs="EPSG:4326")
+        gdf = gpd.GeoDataFrame(dataframe, geometry=geometry, crs='EPSG:4326')
 
     if region:
         # Filter the polygons first to get only the specific region

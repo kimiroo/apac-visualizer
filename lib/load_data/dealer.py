@@ -2,6 +2,8 @@
 
 from typing import TYPE_CHECKING
 import pandas as pd
+import geopandas as gpd
+from shapely.geometry import Point
 
 if TYPE_CHECKING:
     from openpyxl.workbook.workbook import _WorksheetOrChartsheetLike
@@ -54,4 +56,8 @@ class DealerData:
             columns_dealer.append(vertical)
 
         # Convert to Pandas DataFrame
-        self.df = pd.DataFrame(dealer_list, columns=columns_dealer)
+        df = pd.DataFrame(dealer_list, columns=columns_dealer)
+
+        # Convert DataFrame data to GeoDataFrame
+        geometry = [Point(xy) for xy in zip(df['long'], df['lat'])]
+        self.df = gpd.GeoDataFrame(df, geometry=geometry, crs='EPSG:4326')

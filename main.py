@@ -5,6 +5,7 @@ sets up the sidebar filters, and renders the interactive map and
 information panels.
 """
 
+import os
 import yaml
 import streamlit as st
 import folium
@@ -70,36 +71,52 @@ gd = load_geodata()
 
 # Load Excel data
 @st.cache_resource
-def load_excel(filename: str) -> xl.Workbook:
-    """Loads an Excel workbook.
-
-    Args:
-        filename (str): The path to the Excel file.
-
-    Returns:
-        xl.Workbook: The loaded Excel workbook object in read-only and data-only mode.
+def load_data(filename: str, config: dict, mtime: float) -> dict:
     """
-    return xl.load_workbook(filename, data_only=True, read_only=True)
+    Loads Excel, parses sheets, and returns initialized data objects.
+    The 'mtime' argument ensures the cache invalidates when the file changes.
+    """
 
-doc = load_excel(config['source']['filename'])
-sheet_region = doc[config['source']['sheet']['region']['name']]
-sheet_dealer = doc[config['source']['sheet']['dealer']['name']]
-sheet_dealer_customer = doc[config['source']['sheet']['dealerCustomer']['name']]
-sheet_priority_target = doc[config['source']['sheet']['priorityTarget']['name']]
+    doc = xl.load_workbook(filename, data_only=True, read_only=True)
 
-data_dealer = DealerData(config)
-data_dealer_customer = DealerCustomerData(config)
-data_priority_target = PriorityTargetData(config)
-data_region = RegionData(config)
+    try:
+        sheet_region = doc[config['source']['sheet']['region']['name']]
+        sheet_dealer = doc[config['source']['sheet']['dealer']['name']]
+        sheet_dealer_customer = doc[config['source']['sheet']['dealerCustomer']['name']]
+        sheet_priority_target = doc[config['source']['sheet']['priorityTarget']['name']]
 
-data_dealer.load(sheet_dealer)
-data_dealer_customer.load(sheet_dealer_customer)
-data_priority_target.load(sheet_priority_target)
-data_region.load(sheet_region)
+        # Initialize and load data objects
+        data_region = RegionData(config)
+        data_dealer = DealerData(config)
+        data_dealer_customer = DealerCustomerData(config)
+        data_priority_target = PriorityTargetData(config)
 
-# Optimize: Convert dealer data to GeoDataFrame once at startup
-geometry = [Point(xy) for xy in zip(data_dealer.df['long'], data_dealer.df['lat'])]
-data_dealer.df = gpd.GeoDataFrame(data_dealer.df, geometry=geometry, crs="EPSG:4326")
+        data_region.load(sheet_region)
+        data_dealer.load(sheet_dealer)
+        data_dealer_customer.load(sheet_dealer_customer)
+        data_priority_target.load(sheet_priority_target)
+
+        return {
+            'region': data_region,
+            'dealer': data_dealer,
+            'dealer_customer': data_dealer_customer,
+            'priority_target': data_priority_target
+        }
+
+    finally:
+        doc.close()
+
+file_path = config['source']['filename']
+# Get last modified time to trigger cache refresh
+last_modified = os.path.getmtime(file_path)
+
+# This will only run once unless the file or config changes
+data = load_data(file_path, config, last_modified)
+
+data_region: RegionData = data['region']
+data_dealer: DealerData = data['dealer']
+data_dealer_customer: DealerCustomerData = data['dealer_customer']
+data_priority_target: PriorityTargetData = data['priority_target']
 
 panel_dealer = DealerPanel(data_dealer.df, data_dealer_customer.df, config)
 panel_priority_target = PriorityTargetPanel(data_priority_target.df, config)
@@ -370,11 +387,7 @@ if geojson is not None and not geojson.empty:
     ### Automatic Actual Dealer Revenue calculation
 
     # 1. Convert to GeoDataFrame
-    gdf_dealer_heatmap = gpd.GeoDataFrame(
-        df_filtered_dealer_heatmap,
-        geometry=gpd.points_from_xy(df_filtered_dealer_heatmap['long'], df_filtered_dealer_heatmap['lat']),
-        crs="EPSG:4326"
-    )
+    gdf_dealer_heatmap = df_filtered_dealer_heatmap.copy()
 
     # 2. Drop existing region-related columns from dealer data to avoid suffixing
     cols_to_drop = ['NAME_1', 'GID_1', 'GID_0', 'COUNTRY']
@@ -567,11 +580,11 @@ with col2:
                 go_up_panel()
                 st.rerun()
 
-            data = st.session_state.nested_selected_data
-            if data['type'] == 'dealer':
-                panel_dealer.draw(data['id'])
+            selected_data = st.session_state.nested_selected_data
+            if selected_data['type'] == 'dealer':
+                panel_dealer.draw(selected_data['id'])
             else:
-                panel_priority_target.draw(data['id'])
+                panel_priority_target.draw(selected_data['id'])
 
         else:
             # Check if a user clicked a region or a point

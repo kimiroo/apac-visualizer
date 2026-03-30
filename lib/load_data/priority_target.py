@@ -2,6 +2,8 @@
 
 from typing import TYPE_CHECKING
 import pandas as pd
+import geopandas as gpd
+from shapely.geometry import Point
 
 if TYPE_CHECKING:
     from openpyxl.workbook.workbook import _WorksheetOrChartsheetLike
@@ -55,4 +57,8 @@ class PriorityTargetData:
             columns_priority_target.append(vertical)
 
         # Convert to Pandas DataFrame
-        self.df = pd.DataFrame(priority_target_list, columns=columns_priority_target)
+        df = pd.DataFrame(priority_target_list, columns=columns_priority_target)
+
+        # Convert DataFrame data to GeoDataFrame
+        geometry = [Point(xy) for xy in zip(df['long'], df['lat'])]
+        self.df = gpd.GeoDataFrame(df, geometry=geometry, crs='EPSG:4326')
