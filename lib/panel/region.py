@@ -126,23 +126,27 @@ class RegionPanel:
         if show_pie_chart:
             st.write('##### 📊 Market Weightage')
 
-            verticals_no_total = self._config['vertical']
+            try:
+                verticals_no_total = self._config['vertical']
 
-            # Prepare data specifically for the pie chart
-            plot_share = []
+                # Prepare data specifically for the pie chart
+                plot_share = []
 
-            for v in verticals_no_total:
-                val = row[f'{v}_total_market_value']
-                if val > 0:
-                    plot_share.append({'Vertical': v, 'Value': val})
+                for v in verticals_no_total:
+                    val = row[f'{v}_total_market_value']
+                    if val > 0:
+                        plot_share.append({'Vertical': v, 'Value': val})
 
-            df_share = pd.DataFrame(plot_share)
-            chart_share = pie_chart_with_percentage(df_share, '$,.2f')
+                df_share = pd.DataFrame(plot_share)
+                chart_share = pie_chart_with_percentage(df_share, '$,.2f')
 
-            # Draw pie chart
-            if chart_share:
-                st.altair_chart(chart_share, width='stretch')
-            else:
+                # Draw pie chart
+                if chart_share:
+                    st.altair_chart(chart_share, width='stretch')
+                else:
+                    st.warning('No data to display')
+
+            except:
                 st.warning('No data to display')
 
 
