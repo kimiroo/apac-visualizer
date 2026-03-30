@@ -6,7 +6,7 @@ import pandas as pd
 from lib.get_active_verticals import GetActiveVerticalString
 from lib.format_helper import format_currency, format_number
 
-class KeyAccountPanel:
+class PriorityTargetPanel:
     """Handles the rendering of the key account details panel in the Streamlit app."""
 
     def __init__(self, df_dealer: pd.DataFrame, config: dict) -> None:
@@ -81,4 +81,4 @@ class KeyAccountPanel:
             st.info(f"{remarks_text}")
         else:
             # Placeholder when there are no remarks
-            st.caption("No specific remarks available for this key account.")
+            st.caption("No specific remarks available for this priority target.")

@@ -6,7 +6,7 @@ import pandas as pd
 if TYPE_CHECKING:
     from openpyxl.workbook.workbook import _WorksheetOrChartsheetLike
 
-class KeyAccountData:
+class PriorityTargetData:
     """Manages the loading and structuring of key account information."""
 
     def __init__(self, config: dict) -> None:

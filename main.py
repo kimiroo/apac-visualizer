@@ -19,11 +19,11 @@ from lib.click_parser import parse_click
 from lib.geodata import GeoData, filter_by_geometry
 from lib.filter_vertical import filter_by_vertical
 from lib.format_helper import format_currency
-from lib.load_data.priority_target import KeyAccountData
+from lib.load_data.priority_target import PriorityTargetData
 from lib.load_data.dealer import DealerData
 from lib.load_data.region import RegionData
 from lib.panel.dealer import DealerPanel
-from lib.panel.priority_target import KeyAccountPanel
+from lib.panel.priority_target import PriorityTargetPanel
 from lib.panel.region import RegionPanel
 
 # code by me
@@ -86,7 +86,7 @@ sheet_dealer = doc[config['source']['sheet']['dealer']['name']]
 sheet_priority_target = doc[config['source']['sheet']['priorityTarget']['name']]
 
 data_dealer = DealerData(config)
-data_priority_target = KeyAccountData(config)
+data_priority_target = PriorityTargetData(config)
 data_region = RegionData(config)
 
 data_dealer.load(sheet_dealer)
@@ -98,7 +98,7 @@ geometry = [Point(xy) for xy in zip(data_dealer.df['long'], data_dealer.df['lat'
 data_dealer.df = gpd.GeoDataFrame(data_dealer.df, geometry=geometry, crs="EPSG:4326")
 
 panel_dealer = DealerPanel(data_dealer.df, config)
-panel_priority_target = KeyAccountPanel(data_priority_target.df, config)
+panel_priority_target = PriorityTargetPanel(data_priority_target.df, config)
 panel_region = RegionPanel(config)
 
 
