@@ -10,7 +10,7 @@ class PriorityTargetData:
     """Manages the loading and structuring of priority target information."""
 
     def __init__(self, config: dict) -> None:
-        """Initializes the KeyAccountData instance.
+        """Initializes the PriorityTargetData instance.
 
         Args:
             config (dict): Application configuration containing vertical definitions.
