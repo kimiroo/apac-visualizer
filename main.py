@@ -260,9 +260,9 @@ selected_is_customer_key_account = st.sidebar.multiselect(
 # View
 st.sidebar.header('View')
 
-selected_column_ratio = st.sidebar.slider(
-    'Column Width Ratio',
-    key='selected_column_ratio',
+selected_map_width = st.sidebar.slider(
+    'Map Width',
+    key='selected_map_width',
     min_value=1,
     max_value=9,
     step=1,
@@ -451,8 +451,8 @@ if geojson is not None and not geojson.empty:
 
 # Create two columns: Map (Left) and Information (Right)
 total_weight = 10
-col1_weight = selected_column_ratio
-col2_weight = total_weight - selected_column_ratio
+col1_weight = selected_map_width
+col2_weight = total_weight - selected_map_width
 
 col1, col2 = st.columns([col1_weight, col2_weight])
 
