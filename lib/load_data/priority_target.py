@@ -29,20 +29,20 @@ class PriorityTargetData:
         # Load priority target data
         headers = {cell.value: i for i, cell in enumerate(sheet[1])}
 
-        for key_account in sheet.iter_rows(2):
+        for priority_target in sheet.iter_rows(2):
             # Fixed data columns
-            row_data = [str(key_account[i].value) for i in range(7)] + [key_account[i].value for i in range(7, 11)] + [bool(key_account[11].value)]
+            row_data = [str(priority_target[i].value) for i in range(7)] + [priority_target[i].value for i in range(7, 11)] + [bool(priority_target[11].value)]
 
             # Append boolean values for vertical columns dynamically
             for vertical in self._config['vertical']:
                 row_data.append(
-                    bool(key_account[headers[vertical]].value)
+                    bool(priority_target[headers[vertical]].value)
                 )
 
             priority_target_list.append(tuple(row_data))
 
         # Dynamically set extra columns
-        columns_key_account = [
+        columns_priority_target = [
             'area', 'country', 'region',
             'id', 'name', 'address', 'remarks',
             'lat', 'long',
@@ -50,7 +50,7 @@ class PriorityTargetData:
         ]
 
         for vertical in self._config['vertical']:
-            columns_key_account.append(vertical)
+            columns_priority_target.append(vertical)
 
         # Convert to Pandas DataFrame
-        self.df = pd.DataFrame(priority_target_list, columns=columns_key_account)
+        self.df = pd.DataFrame(priority_target_list, columns=columns_priority_target)
