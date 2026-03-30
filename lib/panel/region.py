@@ -255,4 +255,4 @@ class RegionPanel:
                 st.info(f"{remarks_text}")
             else:
                 # Placeholder when there are no remarks
-                st.caption("No specific remarks available for this region.")
+                st.caption('No specific remarks available for this region.')

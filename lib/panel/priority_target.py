@@ -81,4 +81,4 @@ class PriorityTargetPanel:
             st.info(f"{remarks_text}")
         else:
             # Placeholder when there are no remarks
-            st.caption("No specific remarks available for this priority target.")
+            st.warning('Failed to load data for this priority target.')
