@@ -107,8 +107,8 @@ panel_region = RegionPanel(config)
 ###################
 
 # Initialize State
-if 'click_type' not in st.session_state:
-    st.session_state.click_type = None
+if 'map_click_type' not in st.session_state:
+    st.session_state.map_click_type = None
 
 if 'selected_dealer' not in st.session_state:
     st.session_state.selected_dealer = None
@@ -119,8 +119,14 @@ if 'selected_priority_target' not in st.session_state:
 if 'selected_region' not in st.session_state:
     st.session_state.selected_region = None
 
+if 'is_nested_view' not in st.session_state:
+    st.session_state.is_nested_view = False
+
+if 'nested_selected_data' not in st.session_state:
+    st.session_state.nested_selected_data = None
+
 # State updater
-def sync_click_state(map_data):
+def sync_map_click_state(map_data):
 
     # No click data
     if not map_data or not map_data.get('last_object_clicked'):
@@ -133,11 +139,11 @@ def sync_click_state(map_data):
     is_same_priority_target = (click_type == 'priority_target' and st.session_state.get('selected_priority_target') == obj_name)
     is_same_region = (click_type == 'region' and st.session_state.get('selected_region') == obj_name)
 
-    if st.session_state.get('click_type') == click_type and (is_same_dealer or is_same_region or is_same_priority_target):
+    if st.session_state.get('map_click_type') == click_type and (is_same_dealer or is_same_region or is_same_priority_target):
         return
 
     # Store states to session state
-    st.session_state.click_type = click_type
+    st.session_state.map_click_type = click_type
 
     if click_type == 'dealer':
         st.session_state.selected_dealer = obj_name
@@ -148,6 +154,10 @@ def sync_click_state(map_data):
     elif click_type == 'region':
         st.session_state.selected_region = obj_name
         st.rerun()
+
+def go_up_panel():
+    st.session_state.is_nested_view = False
+    st.session_state.nested_selected_data = None
 
 
 ###############
@@ -165,7 +175,7 @@ selected_country = st.sidebar.selectbox(
 )
 
 if st.sidebar.button('Clear selection'):
-    st.session_state.click_type = None
+    st.session_state.map_click_type = None
     st.session_state.selected_dealer = None
     st.session_state.selected_priority_target = None
     st.session_state.selected_region = None
@@ -432,7 +442,7 @@ if geojson is not None and not geojson.empty:
     df_dealers_info_panel = df_filtered_dealer_heatmap.copy()
     df_priority_target_info_panel = df_filtered_priority_target_heatmap.copy()
 
-    if st.session_state.get('click_type') == 'region':
+    if st.session_state.get('map_click_type') == 'region':
         df_dealers_info_panel = filter_by_geometry(
             df_dealers_info_panel,
             geojson,
@@ -542,39 +552,51 @@ with col1:
     )
 
     # Sync click state
-    sync_click_state(map_data)
+    sync_map_click_state(map_data)
 
 with col2:
     # Make column scrollable
     with st.container(height=selected_view_height):
 
-        # Check if a user clicked a region or a point
-        if st.session_state.get('click_type'):
+        if st.session_state.is_nested_view:
+            if st.button("⬅️ Go Back"):
+                go_up_panel()
+                st.rerun()
 
-            if st.session_state.get('click_type') == 'dealer':
-                panel_dealer.draw(st.session_state.selected_dealer)
-
-            elif st.session_state.get('click_type') == 'priority_target':
-                panel_priority_target.draw(st.session_state.selected_priority_target)
-
-            elif st.session_state.get('click_type') == 'region':
-                panel_region.draw(
-                    df_region,
-                    df_dealers_info_panel,
-                    df_priority_target_info_panel,
-                    country = selected_country['name'],
-                    region = st.session_state.selected_region,
-                    vertical = selected_heatmap_vertical
-                )
+            data = st.session_state.nested_selected_data
+            if data['type'] == 'dealer':
+                panel_dealer.draw(data['id'])
+            else:
+                panel_priority_target.draw(data['id'])
 
         else:
-            if selected_country['name'] != 'All':
-                panel_region.draw(
-                    df_region,
-                    df_dealers_info_panel,
-                    df_priority_target_info_panel,
-                    country = selected_country['name'],
-                    vertical = selected_heatmap_vertical
-                )
+            # Check if a user clicked a region or a point
+            if st.session_state.get('map_click_type'):
+
+                if st.session_state.get('map_click_type') == 'dealer':
+                    panel_dealer.draw(st.session_state.selected_dealer)
+
+                elif st.session_state.get('map_click_type') == 'priority_target':
+                    panel_priority_target.draw(st.session_state.selected_priority_target)
+
+                elif st.session_state.get('map_click_type') == 'region':
+                    panel_region.draw(
+                        df_region,
+                        df_dealers_info_panel,
+                        df_priority_target_info_panel,
+                        vertical = selected_heatmap_vertical,
+                        country = selected_country['name'],
+                        region = st.session_state.selected_region
+                    )
+
             else:
-                st.info('Click a pin on the map to see details.')
+                if selected_country['name'] != 'All':
+                    panel_region.draw(
+                        df_region,
+                        df_dealers_info_panel,
+                        df_priority_target_info_panel,
+                        vertical = selected_heatmap_vertical,
+                        country = selected_country['name']
+                    )
+                else:
+                    st.info('Click a pin on the map to see details.')

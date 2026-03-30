@@ -24,8 +24,8 @@ class RegionPanel:
              df_region: pd.DataFrame,
              df_dealers: pd.DataFrame,
              df_priority_targets: pd.DataFrame,
-             country: str,
              vertical: str,
+             country: str,
              region: str | None = None) -> None:
         """Renders the region information panel.
 
@@ -160,9 +160,11 @@ class RegionPanel:
         df_dealers_display.index = df_dealers_display.index + 1
 
         # Draw
-        st.dataframe(
+        event_dealer = st.dataframe(
             df_dealers_display,
-            on_select='ignore',
+            key='table_dealer',
+            on_select='rerun',
+            selection_mode='single-cell',
             width='content',
             column_config={
                 'id': st.column_config.TextColumn('ID', width=100),
@@ -179,7 +181,20 @@ class RegionPanel:
             }
         )
 
+        # Click handler
+        if event_dealer['selection']['cells']:
+            event = event_dealer['selection']['cells']
+            row_idx, col_name = event[0][0], event[0][1]
+
+            if col_name == 'id':
+                selected_id = df_dealers_display.iloc[row_idx]['id']
+
+                st.session_state.is_nested_view = True
+                st.session_state.nested_selected_data = {'type': 'dealer', 'id': selected_id}
+                st.rerun()
+
         st.caption("💡 Tip: This table is affected by 'Vertical' filter under 'Heatmap'.")
+        st.caption("💡 Tip: Click on a Dealer ID to open full details panel.")
 
 
         ### Priority Targets
@@ -196,9 +211,11 @@ class RegionPanel:
         df_priority_target_display.index = df_priority_target_display.index + 1
 
         # Draw
-        st.dataframe(
+        event_priority_target = st.dataframe(
             df_priority_target_display,
-            on_select='ignore',
+            key='table_priority_target',
+            on_select='rerun',
+            selection_mode='single-cell',
             width='content',
             column_config={
                 'id': st.column_config.TextColumn('ID', width=100),
@@ -213,7 +230,20 @@ class RegionPanel:
             }
         )
 
+        # Click handler
+        if event_priority_target['selection']['cells']:
+            event = event_priority_target['selection']['cells']
+            row_idx, col_name = event[0][0], event[0][1]
+
+            if col_name == 'id':
+                selected_id = df_priority_target_display.iloc[row_idx]['id']
+
+                st.session_state.is_nested_view = True
+                st.session_state.nested_selected_data = {'type': 'priority_target', 'id': selected_id}
+                st.rerun()
+
         st.caption("💡 Tip: This table is affected by 'Vertical' filter under 'Heatmap'.")
+        st.caption("💡 Tip: Click on a Target ID to open full details panel.")
 
         ### Remarks
         if region:
