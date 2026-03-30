@@ -71,10 +71,10 @@ class RegionPanel:
             st.metric(label='Dealer Count', value=dealer_cnt)
 
         with col2:
-            total_act_rev = row[f'{vertical}_potential_market_value']
+            actual_dealer_rev = row[f'{vertical}_actual_dealer_revenue']
             plant_cnt = row[f'{vertical}_plant_cnt']
 
-            st.metric(label='Potential Market Value', value=f'${millify(total_act_rev, precision=1).upper()}')
+            st.metric(label=f'Actual Dealer Revenue', value=f'${millify(actual_dealer_rev, precision=1).upper()}')
             st.metric(label='Plant Count', value=int(plant_cnt))
 
 
