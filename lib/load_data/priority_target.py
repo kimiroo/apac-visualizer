@@ -31,7 +31,9 @@ class PriorityTargetData:
 
         for priority_target in sheet.iter_rows(2):
             # Fixed data columns
-            row_data = [str(priority_target[i].value) for i in range(7)] + [priority_target[i].value for i in range(7, 11)] + [bool(priority_target[11].value)]
+            row_data = [str(priority_target[i].value) for i in range(7)] + \
+                [float(priority_target[i].value or 0) for i in range(7, 11)] + \
+                [bool(priority_target[11].value)]
 
             # Append boolean values for vertical columns dynamically
             for vertical in self._config['vertical']:

@@ -31,7 +31,8 @@ class DealerData:
 
         for dealer in sheet.iter_rows(2):
             # Fixed data columns
-            row_data = [str(dealer[i].value) for i in range(9)] + [float(dealer[i].value) for i in range(9, 13)]
+            row_data = [str(dealer[i].value) for i in range(9)] + \
+                [float(dealer[i].value or 0) for i in range(9, 13)]
 
             # Append boolean values for vertical columns dynamically
             for vertical in self._config['vertical']:

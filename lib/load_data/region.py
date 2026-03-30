@@ -72,7 +72,7 @@ class RegionData:
                 base_idx = headers[vertical]
 
                 for idx in range(4):
-                    row_data.append(region[base_idx + idx].value)
+                    row_data.append(float(region[base_idx + idx].value or 0))
 
             region_list.append(tuple(row_data))
 

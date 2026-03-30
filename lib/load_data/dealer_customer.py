@@ -33,7 +33,7 @@ class DealerCustomerData:
             row_data = [
                 str(dealer_customer[0].value),   # Dealer ID
                 str(dealer_customer[2].value),   # Customer Name
-                float(dealer_customer[3].value), # Sale Value
+                float(dealer_customer[3].value or 0), # Sale Value
                 dealer_customer[4].value.date(), # Sale Date
                 str(dealer_customer[5].value),   # Sale Model
             ]
