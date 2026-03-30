@@ -151,10 +151,11 @@ class RegionPanel:
         ### Dealers
         st.write(f'##### 🤝 Dealer list (Vertical: {vertical})')
 
-        df_dealers_display = df_dealers[['id', 'name', 'tier', 'profile', 'address']].copy()
+        df_dealers_display = df_dealers[['id', 'name', 'tier', 'profile', 'actual_revenue', 'address']].copy()
         df_dealers_display['vertical'] = df_dealers[v_cols].apply(self._active_vertical.get, axis=1)
 
-        df_dealers_display.columns = ['ID', 'Name', 'Tier', 'Profile', 'Address', 'Vertical']
+        # Sort
+        df_dealers_display = df_dealers_display.sort_values(by=['actual_revenue'], ascending=False)
 
         # Reset index and convert to human-friendly numbering
         df_dealers_display = df_dealers_display.reset_index(drop=True)
@@ -166,12 +167,17 @@ class RegionPanel:
             on_select='ignore',
             width='content',
             column_config={
-                'ID': st.column_config.TextColumn('ID', width=100),
-                'Name': st.column_config.TextColumn('Name', width='medium'),
-                'Tier': st.column_config.TextColumn('Tier', width='small'),
-                'Profile': st.column_config.TextColumn('Profile', width=150),
-                'Address': st.column_config.TextColumn('Address', width='medium'),
-                'Vertical': st.column_config.TextColumn('Vertical', width='large')
+                'id': st.column_config.TextColumn('ID', width=100),
+                'name': st.column_config.TextColumn('Name', width='medium'),
+                'tier': st.column_config.TextColumn('Tier', width=100),
+                'profile': st.column_config.TextColumn('Profile', width=150),
+                'actual_revenue': st.column_config.NumberColumn(
+                    'Actual Revenue',
+                    format='$%,.2f',
+                    width=150
+                ),
+                'address': st.column_config.TextColumn('Address', width='medium'),
+                'vertical': st.column_config.TextColumn('Vertical', width='large')
             }
         )
 
@@ -181,10 +187,11 @@ class RegionPanel:
         ### Key Accounts
         st.write(f'##### ❤️ Key Account list (Vertical: {vertical})')
 
-        df_key_account_display = df_key_accounts[['id', 'name', 'address']].copy()
+        df_key_account_display = df_key_accounts[['id', 'name', 'value', 'address']].copy()
         df_key_account_display['vertical'] = df_key_accounts[v_cols].apply(self._active_vertical.get, axis=1)
 
-        df_key_account_display.columns = ['ID', 'Name', 'Address', 'Vertical']
+        # Sort
+        df_key_account_display = df_key_account_display.sort_values(by=['value'], ascending=False)
 
         # Reset index and convert to human-friendly numbering
         df_key_account_display = df_key_account_display.reset_index(drop=True)
@@ -196,10 +203,15 @@ class RegionPanel:
             on_select='ignore',
             width='content',
             column_config={
-                'ID': st.column_config.TextColumn('ID', width=100),
-                'Name': st.column_config.TextColumn('Name', width='medium'),
-                'Address': st.column_config.TextColumn('Address', width='medium'),
-                'Vertical': st.column_config.TextColumn('Vertical', width='large')
+                'id': st.column_config.TextColumn('ID', width=100),
+                'name': st.column_config.TextColumn('Name', width='medium'),
+                'value': st.column_config.NumberColumn(
+                    'Value',
+                    format='$%,.2f',
+                    width=150
+                ),
+                'address': st.column_config.TextColumn('Address', width='medium'),
+                'vertical': st.column_config.TextColumn('Vertical', width='large')
             }
         )
 
