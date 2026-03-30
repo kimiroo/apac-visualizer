@@ -8,6 +8,8 @@ source:
       name: Region Vertical Overview
     dealer:
       name: Dealer List
+    dealerCustomer:
+      name: Dealer Customer List
     priorityTarget:
       name: Priority Target List
 vertical:
