@@ -22,11 +22,11 @@ tiers:
   - name: Elite
     color: orange
   - name: Certified
-    color: darkgreen
-  - name: Authorized
-    color: cadetblue
-  - name: Probation
     color: lightgray
+  - name: Authorized
+    color: blue
+  - name: Probation
+    color: black
 isCustomer:
   - value: True
     color: green
