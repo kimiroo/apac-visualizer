@@ -15,8 +15,6 @@ class RegionPanel:
         """Initializes the RegionPanel.
 
         Args:
-            df_dealer (pd.DataFrame): The dataframe containing dealer information.
-            df_key_account (pd.DataFrame): The dataframe containing key account information.
             config (dict): Application configuration dictionary.
         """
         self._config: dict = config
@@ -25,7 +23,7 @@ class RegionPanel:
     def draw(self,
              df_region: pd.DataFrame,
              df_dealers: pd.DataFrame,
-             df_key_accounts: pd.DataFrame,
+             df_priority_targets: pd.DataFrame,
              country: str,
              vertical: str,
              region: str | None = None) -> None:
@@ -184,22 +182,22 @@ class RegionPanel:
         st.caption("💡 Tip: This table is affected by 'Vertical' filter under 'Heatmap'.")
 
 
-        ### Key Accounts
-        st.write(f'##### ❤️ Key Account list (Vertical: {vertical})')
+        ### Priority Targets
+        st.write(f'##### ❤️ Priority Targets list (Vertical: {vertical})')
 
-        df_key_account_display = df_key_accounts[['id', 'name', 'value', 'address']].copy()
-        df_key_account_display['vertical'] = df_key_accounts[v_cols].apply(self._active_vertical.get, axis=1)
+        df_priority_target_display = df_priority_targets[['id', 'name', 'value', 'address']].copy()
+        df_priority_target_display['vertical'] = df_priority_targets[v_cols].apply(self._active_vertical.get, axis=1)
 
         # Sort
-        df_key_account_display = df_key_account_display.sort_values(by=['value'], ascending=False)
+        df_priority_target_display = df_priority_target_display.sort_values(by=['value'], ascending=False)
 
         # Reset index and convert to human-friendly numbering
-        df_key_account_display = df_key_account_display.reset_index(drop=True)
-        df_key_account_display.index = df_key_account_display.index + 1
+        df_priority_target_display = df_priority_target_display.reset_index(drop=True)
+        df_priority_target_display.index = df_priority_target_display.index + 1
 
         # Draw
         st.dataframe(
-            df_key_account_display,
+            df_priority_target_display,
             on_select='ignore',
             width='content',
             column_config={

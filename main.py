@@ -19,11 +19,11 @@ from lib.click_parser import parse_click
 from lib.geodata import GeoData, filter_by_geometry
 from lib.filter_vertical import filter_by_vertical
 from lib.format_helper import format_currency
-from lib.load_data.key_account import KeyAccountData
+from lib.load_data.priority_target import KeyAccountData
 from lib.load_data.dealer import DealerData
 from lib.load_data.region import RegionData
 from lib.panel.dealer import DealerPanel
-from lib.panel.key_account import KeyAccountPanel
+from lib.panel.priority_target import KeyAccountPanel
 from lib.panel.region import RegionPanel
 
 # code by me
@@ -83,14 +83,14 @@ def load_excel(filename: str) -> xl.Workbook:
 doc = load_excel(config['source']['filename'])
 sheet_region = doc[config['source']['sheet']['region']['name']]
 sheet_dealer = doc[config['source']['sheet']['dealer']['name']]
-sheet_key_account = doc[config['source']['sheet']['keyAccount']['name']]
+sheet_priority_target = doc[config['source']['sheet']['priorityTarget']['name']]
 
 data_dealer = DealerData(config)
-data_key_account = KeyAccountData(config)
+data_priority_target = KeyAccountData(config)
 data_region = RegionData(config)
 
 data_dealer.load(sheet_dealer)
-data_key_account.load(sheet_key_account)
+data_priority_target.load(sheet_priority_target)
 data_region.load(sheet_region)
 
 # Optimize: Convert dealer data to GeoDataFrame once at startup
@@ -98,7 +98,7 @@ geometry = [Point(xy) for xy in zip(data_dealer.df['long'], data_dealer.df['lat'
 data_dealer.df = gpd.GeoDataFrame(data_dealer.df, geometry=geometry, crs="EPSG:4326")
 
 panel_dealer = DealerPanel(data_dealer.df, config)
-panel_key_account = KeyAccountPanel(data_key_account.df, config)
+panel_priority_target = KeyAccountPanel(data_priority_target.df, config)
 panel_region = RegionPanel(config)
 
 
@@ -113,8 +113,8 @@ if 'click_type' not in st.session_state:
 if 'selected_dealer' not in st.session_state:
     st.session_state.selected_dealer = None
 
-if 'selected_key_account' not in st.session_state:
-    st.session_state.selected_key_account = None
+if 'selected_priority_target' not in st.session_state:
+    st.session_state.selected_priority_target = None
 
 if 'selected_region' not in st.session_state:
     st.session_state.selected_region = None
@@ -130,10 +130,10 @@ def sync_click_state(map_data):
     click_type, obj_name = parse_click(last_tooltip)
 
     is_same_dealer = (click_type == 'dealer' and st.session_state.get('selected_dealer') == obj_name)
-    is_same_key_account = (click_type == 'key_account' and st.session_state.get('selected_key_account') == obj_name)
+    is_same_priority_target = (click_type == 'priority_target' and st.session_state.get('selected_priority_target') == obj_name)
     is_same_region = (click_type == 'region' and st.session_state.get('selected_region') == obj_name)
 
-    if st.session_state.get('click_type') == click_type and (is_same_dealer or is_same_region or is_same_key_account):
+    if st.session_state.get('click_type') == click_type and (is_same_dealer or is_same_region or is_same_priority_target):
         return
 
     # Store states to session state
@@ -142,8 +142,8 @@ def sync_click_state(map_data):
     if click_type == 'dealer':
         st.session_state.selected_dealer = obj_name
 
-    elif click_type == 'key_account':
-        st.session_state.selected_key_account = obj_name
+    elif click_type == 'priority_target':
+        st.session_state.selected_priority_target = obj_name
 
     elif click_type == 'region':
         st.session_state.selected_region = obj_name
@@ -167,7 +167,7 @@ selected_country = st.sidebar.selectbox(
 if st.sidebar.button('Clear selection'):
     st.session_state.click_type = None
     st.session_state.selected_dealer = None
-    st.session_state.selected_key_account = None
+    st.session_state.selected_priority_target = None
     st.session_state.selected_region = None
     st.rerun()
 
@@ -215,7 +215,7 @@ st.sidebar.caption("💡 Tip: 'Value' filter doesn't apply to the Dealer list in
 st.sidebar.header('Pins')
 
 draw_dealers_pin = st.sidebar.checkbox('Dealers', value=True)
-draw_key_account_pin = st.sidebar.checkbox('Key Account', value=True)
+draw_priority_target_pin = st.sidebar.checkbox('Priority Targets', value=True)
 
 # Dealer
 st.sidebar.header('Dealer')
@@ -234,12 +234,12 @@ selected_tiers_dealer = st.sidebar.multiselect(
     default=[t['name'] for t in config['tiers']]
 )
 
-# Key Account
-st.sidebar.header('Key Account')
+# Priority Targets
+st.sidebar.header('Priority Targets')
 
-selected_verticals_key_account = st.sidebar.multiselect(
+selected_verticals_priority_target = st.sidebar.multiselect(
     'Vertical',
-    key='selected_verticals_key_account',
+    key='selected_verticals_priority_target',
     options=config['vertical'] + ['None'],
     default=config['vertical'] + ['None']
 )
@@ -249,9 +249,9 @@ is_customer_options = [
     {'name': 'Non-Customer', 'value': False}
 ]
 
-selected_is_customer_key_account = st.sidebar.multiselect(
+selected_is_customer_priority_target = st.sidebar.multiselect(
     'Customer',
-    key='selected_is_customer_key_account',
+    key='selected_is_customer_priority_target',
     options=is_customer_options,
     default=is_customer_options,
     format_func=lambda x: x['name']
@@ -296,16 +296,16 @@ geo_key_col = 'NAME_1' if is_level_1 else 'GID_0'
 
 ### Shallow copy DataFrames
 df_filtered_dealer_map_pins = data_dealer.df.copy()
-df_filtered_key_account_map_pins = data_key_account.df.copy()
+df_filtered_priority_target_map_pins = data_priority_target.df.copy()
 df_filtered_dealer_heatmap = data_dealer.df.copy()
-df_filtered_key_account_heatmap = data_key_account.df.copy()
+df_filtered_priority_target_heatmap = data_priority_target.df.copy()
 
 ### Filter country
 if geojson is not None and not geojson.empty:
     df_filtered_dealer_map_pins = filter_by_geometry(df_filtered_dealer_map_pins, geojson)
-    df_filtered_key_account_map_pins = filter_by_geometry(df_filtered_key_account_map_pins, geojson)
+    df_filtered_priority_target_map_pins = filter_by_geometry(df_filtered_priority_target_map_pins, geojson)
     df_filtered_dealer_heatmap = df_filtered_dealer_map_pins.copy()
-    df_filtered_key_account_heatmap = df_filtered_key_account_map_pins.copy()
+    df_filtered_priority_target_heatmap = df_filtered_priority_target_map_pins.copy()
 
 ### Filter vertical
 df_filtered_dealer_map_pins = filter_by_vertical(
@@ -313,36 +313,36 @@ df_filtered_dealer_map_pins = filter_by_vertical(
     selected_verticals_dealer,
     config['vertical']
 )
-df_filtered_key_account_map_pins = filter_by_vertical(
-    df_filtered_key_account_map_pins,
-    selected_verticals_key_account,
+df_filtered_priority_target_map_pins = filter_by_vertical(
+    df_filtered_priority_target_map_pins,
+    selected_verticals_priority_target,
     config['vertical']
 )
 if selected_heatmap_vertical != 'Total':
     df_filtered_dealer_heatmap = df_filtered_dealer_heatmap[
         df_filtered_dealer_heatmap[selected_heatmap_vertical]
     ]
-    df_filtered_key_account_heatmap = df_filtered_key_account_heatmap[
-        df_filtered_key_account_heatmap[selected_heatmap_vertical]
+    df_filtered_priority_target_heatmap = df_filtered_priority_target_heatmap[
+        df_filtered_priority_target_heatmap[selected_heatmap_vertical]
     ]
 
 ### Filter tier (Dealer)
 df_filtered_dealer_map_pins = df_filtered_dealer_map_pins[df_filtered_dealer_map_pins['tier'].isin(selected_tiers_dealer)]
 
 ### Filter customer status (Plant)
-selected_is_customer_key_account_values = [obj['value'] for obj in selected_is_customer_key_account]
-df_filtered_key_account_map_pins = df_filtered_key_account_map_pins[df_filtered_key_account_map_pins['is_customer'].isin(selected_is_customer_key_account_values)]
+selected_is_customer_priority_target_values = [obj['value'] for obj in selected_is_customer_priority_target]
+df_filtered_priority_target_map_pins = df_filtered_priority_target_map_pins[df_filtered_priority_target_map_pins['is_customer'].isin(selected_is_customer_priority_target_values)]
 
 ### Filter dealer, key account pin if region is selected
 if st.session_state.get('selected_region'):
     # Workaround for 'index_right' cannot be a column name in the frames being joined
     df_filtered_dealer_map_pins = df_filtered_dealer_map_pins.drop(['index_right'], axis=1)
-    df_filtered_key_account_map_pins = df_filtered_key_account_map_pins.drop(['index_right'], axis=1)
+    df_filtered_priority_target_map_pins = df_filtered_priority_target_map_pins.drop(['index_right'], axis=1)
 
     df_filtered_dealer_map_pins = filter_by_geometry(df_filtered_dealer_map_pins,
                                                       geojson,
                                                       st.session_state.selected_region)
-    df_filtered_key_account_map_pins = filter_by_geometry(df_filtered_key_account_map_pins,
+    df_filtered_priority_target_map_pins = filter_by_geometry(df_filtered_priority_target_map_pins,
                                                            geojson,
                                                            st.session_state.selected_region)
 
@@ -430,7 +430,7 @@ if geojson is not None and not geojson.empty:
 
     ### Additional filtering for region panel
     df_dealers_info_panel = df_filtered_dealer_heatmap.copy()
-    df_key_account_info_panel = df_filtered_key_account_heatmap.copy()
+    df_priority_target_info_panel = df_filtered_priority_target_heatmap.copy()
 
     if st.session_state.get('click_type') == 'region':
         df_dealers_info_panel = filter_by_geometry(
@@ -438,8 +438,8 @@ if geojson is not None and not geojson.empty:
             geojson,
             st.session_state.selected_region
         )
-        df_key_account_info_panel = filter_by_geometry(
-            df_key_account_info_panel,
+        df_priority_target_info_panel = filter_by_geometry(
+            df_priority_target_info_panel,
             geojson,
             st.session_state.selected_region
         )
@@ -522,13 +522,13 @@ with col1:
                 ).add_to(m)
 
     # Draw key account pins
-    if draw_key_account_pin:
-        for _, row in df_filtered_key_account_map_pins.iterrows():
+    if draw_priority_target_pin:
+        for _, row in df_filtered_priority_target_map_pins.iterrows():
             # Check for NaN coordinates to avoid errors
             if pd.notnull(row['lat']) and pd.notnull(row['long']):
                 folium.Marker(
                     location=[row['lat'], row['long']],
-                    tooltip=f'''<b>Key Account:</b> {row['name']} ({row['id']})<br>
+                    tooltip=f'''<b>Priority Target:</b> {row['name']} ({row['id']})<br>
                                 Value: {format_currency(row['value'])}''',
                     icon=folium.Icon(color=is_customer_color_map.get(row['is_customer'], 'black'), icon='industry', prefix='fa')
                 ).add_to(m)
@@ -554,14 +554,14 @@ with col2:
             if st.session_state.get('click_type') == 'dealer':
                 panel_dealer.draw(st.session_state.selected_dealer)
 
-            elif st.session_state.get('click_type') == 'key_account':
-                panel_key_account.draw(st.session_state.selected_key_account)
+            elif st.session_state.get('click_type') == 'priority_target':
+                panel_priority_target.draw(st.session_state.selected_priority_target)
 
             elif st.session_state.get('click_type') == 'region':
                 panel_region.draw(
                     df_region,
                     df_dealers_info_panel,
-                    df_key_account_info_panel,
+                    df_priority_target_info_panel,
                     country = selected_country['name'],
                     region = st.session_state.selected_region,
                     vertical = selected_heatmap_vertical
@@ -572,7 +572,7 @@ with col2:
                 panel_region.draw(
                     df_region,
                     df_dealers_info_panel,
-                    df_key_account_info_panel,
+                    df_priority_target_info_panel,
                     country = selected_country['name'],
                     vertical = selected_heatmap_vertical
                 )

@@ -8,8 +8,8 @@ source:
       name: Region Vertical Overview
     dealer:
       name: Dealer List
-    keyAccount:
-      name: Key Account List
+    priorityTarget:
+      name: Priority Target List
 vertical:
   - F&B
   - Heavy Industry

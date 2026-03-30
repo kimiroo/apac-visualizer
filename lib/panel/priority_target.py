@@ -1,4 +1,4 @@
-"""Module for rendering the Key Account Information Panel."""
+"""Module for rendering the Priority Target Information Panel."""
 
 import streamlit as st
 import pandas as pd
@@ -20,14 +20,14 @@ class KeyAccountPanel:
         self._config: dict = config
         self._active_vertical = GetActiveVerticalString(self._config)
 
-    def draw(self, key_account_id: str) -> None:
+    def draw(self, priority_target_id: str) -> None:
         """Renders the key_account information panel for a specific key_account ID.
 
         Args:
             key_account_id (str): The unique identifier of the key account to display.
         """
 
-        data = self._df[self._df['id'] == str(key_account_id)]
+        data = self._df[self._df['id'] == str(priority_target_id)]
 
         if data.empty:
             st.warning('No data found for this key account.')
@@ -35,10 +35,10 @@ class KeyAccountPanel:
 
         row = data.iloc[0]
 
-        st.subheader(f'❤️ Key Account: {row['name']}')
+        st.subheader(f'❤️ Priority Target: {row['name']}')
 
         ### Information Table
-        st.write('##### 📝 Key Account Information')
+        st.write('##### 📝 Priority Target Information')
 
         # Extract active verticals (where value is True)
         active_vertical_string = self._active_vertical.get(row)
