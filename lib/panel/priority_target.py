@@ -7,13 +7,13 @@ from lib.get_active_verticals import GetActiveVerticalString
 from lib.format_helper import format_currency, format_number
 
 class PriorityTargetPanel:
-    """Handles the rendering of the key account details panel in the Streamlit app."""
+    """Handles the rendering of the priority target details panel in the Streamlit app."""
 
     def __init__(self, df_dealer: pd.DataFrame, config: dict) -> None:
         """Initializes the KeyAccountPanel.
 
         Args:
-            df_key_account (pd.DataFrame): The dataframe containing key account information.
+            df_key_account (pd.DataFrame): The dataframe containing priority target information.
             config (dict): Application configuration dictionary.
         """
         self._df: pd.DataFrame = df_dealer
@@ -21,10 +21,10 @@ class PriorityTargetPanel:
         self._active_vertical = GetActiveVerticalString(self._config)
 
     def draw(self, priority_target_id: str) -> None:
-        """Renders the key_account information panel for a specific key_account ID.
+        """Renders the priority_target information panel for a specific priority_target ID.
 
         Args:
-            key_account_id (str): The unique identifier of the key account to display.
+            key_account_id (str): The unique identifier of the priority target to display.
         """
 
         data = self._df[self._df['id'] == str(priority_target_id)]
