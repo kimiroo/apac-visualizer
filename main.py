@@ -12,7 +12,6 @@ import folium
 from streamlit_folium import st_folium
 import pandas as pd
 import geopandas as gpd
-from shapely.geometry import Point
 import openpyxl as xl
 
 from lib.get_divisor import get_divisor
@@ -167,12 +166,15 @@ def sync_map_click_state(map_data):
     st.session_state.map_click_type = click_type
 
     if click_type == 'dealer':
+        go_up_panel()
         st.session_state.selected_dealer = obj_name
 
     elif click_type == 'priority_target':
+        go_up_panel()
         st.session_state.selected_priority_target = obj_name
 
     elif click_type == 'region':
+        go_up_panel()
         st.session_state.selected_region = obj_name
         st.rerun()
 
