@@ -10,6 +10,8 @@ source:
       name: Dealer List
     dealerCustomer:
       name: Dealer Customer List
+    keyAccount:
+      name: Key Account List
     priorityTarget:
       name: Priority Target List
 vertical:
@@ -34,3 +36,4 @@ isCustomer:
     color: green
   - value: False
     color: red
+keyAccountColor: darkblue

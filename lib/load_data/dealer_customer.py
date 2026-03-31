@@ -1,7 +1,6 @@
 """Module for loading and processing dealer customer data from Excel sheets."""
 
 from typing import TYPE_CHECKING
-from datetime import datetime, date
 import pandas as pd
 
 if TYPE_CHECKING:

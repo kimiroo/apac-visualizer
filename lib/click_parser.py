@@ -2,10 +2,11 @@
 
 import re
 
-filter_click_type = r'(?:^|>|\s)(Region|Dealer|Priority Target):'
+filter_click_type = r'(?:^|>|\s)(Region|Dealer|Key Account Plant|Priority Target):'
 
 filter_region = r'(?:\s+)(.+)'
 filter_dealer = r'^Dealer: .* \((.*)\)'
+filter_key_account = r'^Key Account Plant: .* \((.*)\)'
 filter_priority_target = r'^Priority Target: .* \((.*)\)'
 
 def parse_click(tooltip_string: str) -> tuple[str | None, str | None]:
@@ -35,6 +36,12 @@ def parse_click(tooltip_string: str) -> tuple[str | None, str | None]:
         dealer_id = found_id[0]
 
         return 'dealer', dealer_id
+
+    elif found[0] == 'Key Account Plant':
+        found_id = re.findall(filter_key_account, tooltip_string)
+        key_account_id = found_id[0]
+
+        return 'key_account', key_account_id
 
     elif found[0] == 'Priority Target':
         found_id = re.findall(filter_priority_target, tooltip_string)
