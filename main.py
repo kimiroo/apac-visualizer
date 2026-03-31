@@ -7,6 +7,7 @@ information panels.
 
 import os
 import yaml
+from datetime import datetime
 import streamlit as st
 import folium
 from streamlit_folium import st_folium
@@ -56,7 +57,6 @@ st.set_page_config(
     page_icon=config['app']['favicon'],
     layout='wide'
 )
-st.title(config['app']['title'])
 
 # Load geodata
 @st.cache_resource
@@ -113,10 +113,11 @@ def load_data(filename: str, config: dict, mtime: float) -> dict:
 
 file_path = config['source']['filename']
 # Get last modified time to trigger cache refresh
-last_modified = os.path.getmtime(file_path)
+mtime_float = os.path.getmtime(file_path)
+mtime_datetime = datetime.fromtimestamp(mtime_float)
 
 # This will only run once unless the file or config changes
-data = load_data(file_path, config, last_modified)
+data = load_data(file_path, config, mtime_float)
 
 data_region: RegionData = data['region']
 data_dealer: DealerData = data['dealer']
@@ -521,6 +522,23 @@ if geojson is not None and not geojson.empty:
 ##############
 ### Render ###
 ##############
+
+# Header
+st.html(f'''
+    <style>
+        .title {{
+            font-size: 2.75rem;
+            font-weight: 700;
+        }}
+        .info {{
+            color: #666;
+            font-size: 1rem;
+            padding-left: 1rem;
+        }}
+    </style>
+    <span class="title">{config['app']['title']}</span>
+    <span class="info">Last Modified: {mtime_datetime.strftime('%Y-%m-%d %H:%M:%S')}</span>
+''')
 
 # Create two columns: Map (Left) and Information (Right)
 total_weight = 10
