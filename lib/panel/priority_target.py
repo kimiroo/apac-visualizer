@@ -13,7 +13,7 @@ class PriorityTargetPanel:
         """Initializes the KeyAccountPanel.
 
         Args:
-            df_key_account (pd.DataFrame): The dataframe containing priority target information.
+            df_priority_target (pd.DataFrame): The dataframe containing priority target information.
             config (dict): Application configuration dictionary.
         """
         self._df: pd.DataFrame = df_dealer
@@ -24,7 +24,7 @@ class PriorityTargetPanel:
         """Renders the priority_target information panel for a specific priority_target ID.
 
         Args:
-            key_account_id (str): The unique identifier of the priority target to display.
+            priority_target_id (str): The unique identifier of the priority target to display.
         """
 
         data = self._df[self._df['id'] == str(priority_target_id)]
