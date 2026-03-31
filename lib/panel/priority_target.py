@@ -9,14 +9,14 @@ from lib.format_helper import format_currency, format_number
 class PriorityTargetPanel:
     """Handles the rendering of the priority target details panel in the Streamlit app."""
 
-    def __init__(self, df_dealer: pd.DataFrame, config: dict) -> None:
+    def __init__(self, df_priority_target: pd.DataFrame, config: dict) -> None:
         """Initializes the KeyAccountPanel.
 
         Args:
             df_priority_target (pd.DataFrame): The dataframe containing priority target information.
             config (dict): Application configuration dictionary.
         """
-        self._df: pd.DataFrame = df_dealer
+        self._df: pd.DataFrame = df_priority_target
         self._config: dict = config
         self._active_vertical = GetActiveVerticalString(self._config)
 
