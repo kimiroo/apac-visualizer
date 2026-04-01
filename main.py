@@ -37,13 +37,39 @@ from lib.panel.region import RegionPanel
 # Author: kimiroo (Yongjun Kim)
 
 
+CONFIG_PATH = 'config.yaml'
+EXCEL_PATH = 'Dataset.xlsx'
+GEODATA_MARKER_PATH = get_project_root() / 'geodata' / 'LAST_MODIFIED'
+
+##################
+### File Check ###
+##################
+
+if not os.path.exists(CONFIG_PATH):
+    st.error('Failed to find config file. Check server configuration.')
+    st.stop()
+
+if not os.path.exists(EXCEL_PATH):
+    st.error('No spreadsheet file has been loaded on the server. Upload spreadsheet file in the management console.')
+    st.stop()
+
+
 ##############
 ### Config ###
 ##############
 
 # Load config
-with open('config.yaml', 'r', encoding='utf-8') as f:
-    config = yaml.full_load(f.read())
+@st.cache_resource
+def load_config(mtime: float) -> dict:
+    with open('config.yaml', 'r', encoding='utf-8') as f:
+        config = yaml.full_load(f.read())
+
+    return config
+
+mtime_config_float = os.path.getmtime('config.yaml')
+mtime_config_datetime = datetime.fromtimestamp(mtime_config_float)
+
+config: dict = load_config(mtime_config_float)
 
 tier_color_map = {t['name']: t['color'] for t in config['tiers']}
 is_customer_color_map = {x['value']: x['color'] for x in config['isCustomer']}
@@ -70,11 +96,10 @@ def load_geodata(mtime: float) -> GeoData:
     """
     return GeoData()
 
-geodata_marker_path = get_project_root() / 'geodata' / 'LAST_MODIFIED'
-mtime_geodjson_float = os.path.getmtime(geodata_marker_path)
-mtime_geodjson_datetime = datetime.fromtimestamp(mtime_geodjson_float)
+mtime_geojson_float = os.path.getmtime(GEODATA_MARKER_PATH)
+mtime_geojson_datetime = datetime.fromtimestamp(mtime_geojson_float)
 
-gd = load_geodata(mtime_geodjson_float)
+gd = load_geodata(mtime_geojson_float)
 
 # Load Excel data
 @st.cache_resource
@@ -117,13 +142,12 @@ def load_data(filename: str, config: dict, mtime: float) -> dict:
     finally:
         doc.close()
 
-file_path = config['source']['filename']
 # Get last modified time to trigger cache refresh
-mtime_excel_float = os.path.getmtime(file_path)
+mtime_excel_float = os.path.getmtime(EXCEL_PATH)
 mtime_excel_datetime = datetime.fromtimestamp(mtime_excel_float)
 
 # This will only run once unless the file or config changes
-data = load_data(file_path, config, mtime_excel_float)
+data = load_data(EXCEL_PATH, config, mtime_excel_float)
 
 data_region: RegionData = data['region']
 data_dealer: DealerData = data['dealer']
