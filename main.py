@@ -226,7 +226,7 @@ if st.sidebar.button('Clear selection'):
     st.session_state.selected_region = None
     st.rerun()
 
-st.sidebar.caption("💡 Tip: 'Clear selection' button clears region/dealer selection on the map.")
+st.sidebar.caption("💡 Tip: 'Clear selection' button only clears the region/pin selection on the map.")
 
 # Heatmap
 st.sidebar.header('Heatmap')
