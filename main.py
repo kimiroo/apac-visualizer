@@ -6,7 +6,7 @@ information panels.
 """
 
 import os
-import yaml
+import json
 from datetime import datetime
 import streamlit as st
 import folium
@@ -32,14 +32,16 @@ from lib.panel.key_account import KeyAccountPanel
 from lib.panel.priority_target import PriorityTargetPanel
 from lib.panel.region import RegionPanel
 
+
 # code by me
 # https://github.com/kimiroo/apac-visualizer
 # Author: kimiroo (Yongjun Kim)
 
 
-CONFIG_PATH = 'config.yaml'
+CONFIG_PATH = 'config.json'
 EXCEL_PATH = 'Dataset.xlsx'
 GEODATA_MARKER_PATH = get_project_root() / 'geodata' / 'LAST_MODIFIED'
+
 
 ##################
 ### File Check ###
@@ -61,12 +63,12 @@ if not os.path.exists(EXCEL_PATH):
 # Load config
 @st.cache_resource
 def load_config(mtime: float) -> dict:
-    with open('config.yaml', 'r', encoding='utf-8') as f:
-        config = yaml.full_load(f.read())
+    with open(CONFIG_PATH, 'r', encoding='utf-8') as f:
+        config = json.load(f)
 
     return config
 
-mtime_config_float = os.path.getmtime('config.yaml')
+mtime_config_float = os.path.getmtime(CONFIG_PATH)
 mtime_config_datetime = datetime.fromtimestamp(mtime_config_float)
 
 config: dict = load_config(mtime_config_float)
@@ -82,7 +84,7 @@ is_customer_color_map = {x['value']: x['color'] for x in config['isCustomer']}
 # Set page to wide mode for the side panel layout
 st.set_page_config(
     page_title=config['app']['title'],
-    page_icon=config['app']['favicon'],
+    page_icon='assets/plana.png',
     layout='wide'
 )
 

@@ -1,0 +1,63 @@
+{
+    "app": {
+        "title": "APAC Geo-Coverage Tool"
+    },
+    "source": {
+        "sheet": {
+            "region": {
+                "name": "Region Vertical Overview"
+            },
+            "dealer": {
+                "name": "Dealer List"
+            },
+            "dealerCustomer": {
+                "name": "Dealer Customer List"
+            },
+            "keyAccount": {
+                "name": "Key Account List"
+            },
+            "priorityTarget": {
+                "name": "Priority Target List"
+            }
+        }
+    },
+    "vertical": [
+        "F&B",
+        "Heavy Industry",
+        "Chemical/Pharma",
+        "Electronics",
+        "Mobility"
+    ],
+    "showOptionalData": {
+        "projectedRevenue": false
+    },
+    "tiers": [
+        {
+            "name": "Elite",
+            "color": "orange"
+        },
+        {
+            "name": "Certified",
+            "color": "lightgray"
+        },
+        {
+            "name": "Authorized",
+            "color": "blue"
+        },
+        {
+            "name": "Probation",
+            "color": "black"
+        }
+    ],
+    "isCustomer": [
+        {
+            "value": true,
+            "color": "green"
+        },
+        {
+            "value": false,
+            "color": "red"
+        }
+    ],
+    "keyAccountColor": "darkblue"
+}
