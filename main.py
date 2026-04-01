@@ -15,11 +15,13 @@ import pandas as pd
 import geopandas as gpd
 import openpyxl as xl
 
+from lib.filter_by_geometry import filter_by_geometry
 from lib.get_divisor import get_divisor
 from lib.click_parser import parse_click
-from lib.geodata import GeoData, filter_by_geometry
+from lib.load_data.geodata import GeoData
 from lib.filter_vertical import filter_by_vertical
 from lib.format_helper import format_currency
+from lib.get_project_root import get_project_root
 from lib.load_data.dealer import DealerData
 from lib.load_data.dealer_customer import DealerCustomerData
 from lib.load_data.key_account import KeyAccountData
@@ -60,7 +62,7 @@ st.set_page_config(
 
 # Load geodata
 @st.cache_resource
-def load_geodata() -> GeoData:
+def load_geodata(mtime: float) -> GeoData:
     """Loads and caches the GeoData instance.
 
     Returns:
@@ -68,7 +70,11 @@ def load_geodata() -> GeoData:
     """
     return GeoData()
 
-gd = load_geodata()
+geodata_marker_path = get_project_root() / 'geodata' / 'LAST_MODIFIED'
+mtime_geodjson_float = os.path.getmtime(geodata_marker_path)
+mtime_geodjson_datetime = datetime.fromtimestamp(mtime_geodjson_float)
+
+gd = load_geodata(mtime_geodjson_float)
 
 # Load Excel data
 @st.cache_resource
@@ -113,11 +119,11 @@ def load_data(filename: str, config: dict, mtime: float) -> dict:
 
 file_path = config['source']['filename']
 # Get last modified time to trigger cache refresh
-mtime_float = os.path.getmtime(file_path)
-mtime_datetime = datetime.fromtimestamp(mtime_float)
+mtime_excel_float = os.path.getmtime(file_path)
+mtime_excel_datetime = datetime.fromtimestamp(mtime_excel_float)
 
 # This will only run once unless the file or config changes
-data = load_data(file_path, config, mtime_float)
+data = load_data(file_path, config, mtime_excel_float)
 
 data_region: RegionData = data['region']
 data_dealer: DealerData = data['dealer']
@@ -537,7 +543,7 @@ st.html(f'''
         }}
     </style>
     <span class="title">{config['app']['title']}</span>
-    <span class="info">Last Modified: {mtime_datetime.strftime('%Y-%m-%d %H:%M:%S')}</span>
+    <span class="info">Last Modified: {mtime_excel_datetime.strftime('%Y-%m-%d %H:%M:%S')}</span>
 ''')
 
 # Create two columns: Map (Left) and Information (Right)
