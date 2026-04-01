@@ -10,8 +10,6 @@ attrs==25.4.0
     # via
     #   jsonschema
     #   referencing
-beautifulsoup4==4.14.3
-    # via -r requirements.in
 blinker==1.9.0
     # via streamlit
 branca==0.8.2
@@ -113,8 +111,6 @@ python-dateutil==2.9.0.post0
     # via pandas
 pytz==2026.1.post1
     # via pandas
-pyyaml==6.0.3
-    # via -r requirements.in
 referencing==0.37.0
     # via
     #   jsonschema
@@ -138,8 +134,6 @@ six==1.17.0
     # via python-dateutil
 smmap==5.0.2
     # via gitdb
-soupsieve==2.8.3
-    # via beautifulsoup4
 streamlit==1.55.0
     # via
     #   -r requirements.in
@@ -157,7 +151,6 @@ tornado==6.5.4
 typing-extensions==4.15.0
     # via
     #   altair
-    #   beautifulsoup4
     #   streamlit
 tzdata==2025.3
     # via pandas
