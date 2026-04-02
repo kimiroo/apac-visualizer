@@ -59,5 +59,6 @@
             "color": "red"
         }
     ],
-    "keyAccountColor": "darkblue"
+    "keyAccountColor": "darkblue",
+    "appMemo": "Inquries:  \nabc@example.com"
 }

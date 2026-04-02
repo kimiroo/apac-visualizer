@@ -380,6 +380,13 @@ selected_view_height = st.sidebar.slider(
 
 st.sidebar.caption("💡 Tip: Adjust 'View Height' to resize the map and info panel.")
 
+# App Memo
+memo = config.get('appMemo', '')
+
+if memo:
+    st.sidebar.divider()
+    st.sidebar.write(memo)
+
 
 ##############
 ### Filter ###
