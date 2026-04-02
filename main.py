@@ -576,7 +576,7 @@ st.html(f'''
         }}
     </style>
     <span class="title">{config['app']['title']}</span>
-    <span class="info">Last Modified: {mtime_excel_datetime.strftime('%Y-%m-%d %H:%M:%S')}</span>
+    <span class="info">Upload: {mtime_excel_datetime.strftime('%Y-%m-%d %H:%M:%S')}</span>
 ''')
 
 # Create two columns: Map (Left) and Information (Right)
