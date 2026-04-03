@@ -16,6 +16,8 @@ COPY . .
 
 VOLUME ["/data"]
 
+ENV IS_CONTAINER=true
+
 EXPOSE 8501
 
 HEALTHCHECK --interval=30s --timeout=3s \
