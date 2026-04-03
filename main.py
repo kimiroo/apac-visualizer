@@ -7,6 +7,7 @@ information panels.
 
 import os
 import json
+import base64
 from datetime import datetime
 import streamlit as st
 import folium
@@ -15,13 +16,14 @@ import pandas as pd
 import geopandas as gpd
 import openpyxl as xl
 
+from const.file_path import *
+from util.is_container import IS_CONTAINER
 from util.filter_by_geometry import filter_by_geometry
 from util.get_divisor import get_divisor
 from util.click_parser import parse_click
 from load_data.geodata import GeoData
 from util.filter_vertical import filter_by_vertical
 from util.format_helper import format_currency
-from util.get_project_root import get_project_root
 from load_data.dealer import DealerData
 from load_data.dealer_customer import DealerCustomerData
 from load_data.key_account import KeyAccountData
@@ -39,20 +41,15 @@ from dialog.glossary_n_credits import dialog_glossary_n_credits
 # Author: kimiroo (Yongjun Kim)
 
 
-CONFIG_PATH = 'config.json'
-EXCEL_PATH = 'Dataset.xlsx'
-GEODATA_MARKER_PATH = get_project_root() / 'geodata' / 'LAST_MODIFIED'
-
-
 ##################
 ### File Check ###
 ##################
 
-if not os.path.exists(CONFIG_PATH):
+if not os.path.exists(PATH_CONFIG):
     st.error('Failed to find config file. Check server configuration.')
     st.stop()
 
-if not os.path.exists(EXCEL_PATH):
+if not os.path.exists(PATH_EXCEL):
     st.error('No spreadsheet file has been loaded on the server. Upload spreadsheet file in the management console.')
     st.stop()
 
@@ -64,12 +61,12 @@ if not os.path.exists(EXCEL_PATH):
 # Load config
 @st.cache_resource
 def load_config(mtime: float) -> dict:
-    with open(CONFIG_PATH, 'r', encoding='utf-8') as f:
+    with open(PATH_CONFIG, 'r', encoding='utf-8') as f:
         config = json.load(f)
 
     return config
 
-mtime_config_float = os.path.getmtime(CONFIG_PATH)
+mtime_config_float = os.path.getmtime(PATH_CONFIG)
 mtime_config_datetime = datetime.fromtimestamp(mtime_config_float)
 
 config: dict = load_config(mtime_config_float)
@@ -82,10 +79,25 @@ is_customer_color_map = {x['value']: x['color'] for x in config['isCustomer']}
 ### Init ###
 ############
 
+# Load icon
+@st.cache_resource
+def load_icon(path, mtime):
+    with open(path, 'rb') as f:
+        b64 = base64.b64encode(f.read()).decode()
+
+    return b64
+
+current_icon_path = PATH_ICON if os.path.exists(PATH_ICON) else PATH_ICON_DEFAULT
+
+# Get last modified time to trigger cache refresh
+mtime_icon_float = os.path.getmtime(current_icon_path)
+
+icon_b64 = load_icon(current_icon_path, mtime_icon_float)
+
 # Set page to wide mode for the side panel layout
 st.set_page_config(
     page_title=config['app']['title'],
-    page_icon='assets/plana.png',
+    page_icon=current_icon_path,
     layout='wide'
 )
 
@@ -99,7 +111,7 @@ def load_geodata(mtime: float) -> GeoData:
     """
     return GeoData()
 
-mtime_geojson_float = os.path.getmtime(GEODATA_MARKER_PATH)
+mtime_geojson_float = os.path.getmtime(PATH_GEOJSON_MARKER)
 mtime_geojson_datetime = datetime.fromtimestamp(mtime_geojson_float)
 
 gd = load_geodata(mtime_geojson_float)
@@ -146,11 +158,11 @@ def load_data(filename: str, config: dict, mtime: float) -> dict:
         doc.close()
 
 # Get last modified time to trigger cache refresh
-mtime_excel_float = os.path.getmtime(EXCEL_PATH)
+mtime_excel_float = os.path.getmtime(PATH_EXCEL)
 mtime_excel_datetime = datetime.fromtimestamp(mtime_excel_float)
 
 # This will only run once unless the file or config changes
-data = load_data(EXCEL_PATH, config, mtime_excel_float)
+data = load_data(PATH_EXCEL, config, mtime_excel_float)
 
 data_region: RegionData = data['region']
 data_dealer: DealerData = data['dealer']
@@ -574,18 +586,44 @@ if geojson is not None and not geojson.empty:
 # Header
 st.html(f'''
     <style>
-        .title {{
+        .x-header-wrapper {{
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.5rem 0;
+        }}
+        .x-title-container {{
+            display: flex;
+            align-items: baseline;
+            gap: 0.75rem;
+        }}
+        .x-header-icon {{
+            width: 2.75rem;
+            height: 2.75rem;
+            display: block;
+        }}
+        .x-header-title {{
             font-size: 2.75rem;
             font-weight: 700;
+            line-height: 1;
+            margin: 0;
+            padding: 0;
         }}
-        .info {{
+        .x-header-info {{
             color: #666;
-            font-size: 1rem;
-            padding-left: 1rem;
+            font-size: 0.875rem;
+            margin: 0;
+            white-space: nowrap;
+            padding-bottom: 0.25rem;
         }}
     </style>
-    <span class="title">{config['app']['title']}</span>
-    <span class="info">Upload: {mtime_excel_datetime.strftime('%Y-%m-%d %H:%M:%S')}</span>
+    <div class="x-header-wrapper">
+        <img src="data:image/png;base64,{icon_b64}" class="x-header-icon">
+        <div class="x-title-container">
+            <span class="x-header-title">{config['app']['title']}</span>
+            <span class="x-header-info">Upload: {mtime_excel_datetime.strftime('%Y-%m-%d %H:%M:%S')}</span>
+        </div>
+    </div>
 ''')
 
 # Create two columns: Map (Left) and Information (Right)

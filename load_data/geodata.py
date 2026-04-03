@@ -3,16 +3,14 @@
 import pycountry
 import geopandas as gpd
 
-from util.get_project_root import get_project_root
-
-GEODATA_PATH = get_project_root() / 'geodata'
+from const.file_path import PATH_GEOJSON
 
 class GeoData:
     """Manages loading and retrieving of country and region geospatial data."""
 
     def __init__(self):
         """Initializes the GeoData instance by loading all available GeoJSON data."""
-        geojson_path_list = [f for f in GEODATA_PATH.glob("*.json") if f.is_file()]
+        geojson_path_list = [f for f in PATH_GEOJSON.glob("*.json") if f.is_file()]
 
         self.geojson_dict = {}
         self.country_list = [{'name': 'All', 'code': None}]
