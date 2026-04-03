@@ -31,6 +31,7 @@ from lib.panel.dealer import DealerPanel
 from lib.panel.key_account import KeyAccountPanel
 from lib.panel.priority_target import PriorityTargetPanel
 from lib.panel.region import RegionPanel
+from lib.dialog.glossary_n_credits import dialog_glossary_n_credits
 
 
 # code by me
@@ -380,11 +381,19 @@ selected_view_height = st.sidebar.slider(
 
 st.sidebar.caption("💡 Tip: Adjust 'View Height' to resize the map and info panel.")
 
-# App Memo
+# App Memo & Glossary
 memo = config.get('appMemo', '')
+glossary = config.get('glossary', '')
+
+st.sidebar.divider()
+
+if st.sidebar.button(
+    'Glossary & Credits',
+    key='btn_glossary'
+):
+    dialog_glossary_n_credits(glossary)
 
 if memo:
-    st.sidebar.divider()
     st.sidebar.write(memo)
 
 
