@@ -8,7 +8,7 @@ information panels.
 import os
 import json
 import base64
-from datetime import datetime
+from datetime import datetime, UTC
 import streamlit as st
 import folium
 from streamlit_folium import st_folium
@@ -67,7 +67,7 @@ def load_config(mtime: float) -> dict:
     return config
 
 mtime_config_float = os.path.getmtime(PATH_CONFIG)
-mtime_config_datetime = datetime.fromtimestamp(mtime_config_float)
+mtime_config_datetime = datetime.fromtimestamp(mtime_config_float, tz=UTC)
 
 config: dict = load_config(mtime_config_float)
 
@@ -112,7 +112,7 @@ def load_geodata(mtime: float) -> GeoData:
     return GeoData()
 
 mtime_geojson_float = os.path.getmtime(PATH_GEOJSON_MARKER)
-mtime_geojson_datetime = datetime.fromtimestamp(mtime_geojson_float)
+mtime_geojson_datetime = datetime.fromtimestamp(mtime_geojson_float, tz=UTC)
 
 gd = load_geodata(mtime_geojson_float)
 
@@ -159,7 +159,7 @@ def load_data(filename: str, config: dict, mtime: float) -> dict:
 
 # Get last modified time to trigger cache refresh
 mtime_excel_float = os.path.getmtime(PATH_EXCEL)
-mtime_excel_datetime = datetime.fromtimestamp(mtime_excel_float)
+mtime_excel_datetime = datetime.fromtimestamp(mtime_excel_float, tz=UTC)
 
 # This will only run once unless the file or config changes
 data = load_data(PATH_EXCEL, config, mtime_excel_float)
@@ -621,7 +621,7 @@ st.html(f'''
         <img src="data:image/png;base64,{icon_b64}" class="x-header-icon">
         <div class="x-title-container">
             <span class="x-header-title">{config['app']['title']}</span>
-            <span class="x-header-info">Upload: {mtime_excel_datetime.strftime('%Y-%m-%d %H:%M:%S')}</span>
+            <span class="x-header-info">Upload: {mtime_excel_datetime.strftime('%Y-%m-%d %H:%M:%S')} (UTC)</span>
         </div>
     </div>
 ''')
