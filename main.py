@@ -15,23 +15,23 @@ import pandas as pd
 import geopandas as gpd
 import openpyxl as xl
 
-from lib.filter_by_geometry import filter_by_geometry
-from lib.get_divisor import get_divisor
-from lib.click_parser import parse_click
-from lib.load_data.geodata import GeoData
-from lib.filter_vertical import filter_by_vertical
-from lib.format_helper import format_currency
-from lib.get_project_root import get_project_root
-from lib.load_data.dealer import DealerData
-from lib.load_data.dealer_customer import DealerCustomerData
-from lib.load_data.key_account import KeyAccountData
-from lib.load_data.priority_target import PriorityTargetData
-from lib.load_data.region import RegionData
-from lib.panel.dealer import DealerPanel
-from lib.panel.key_account import KeyAccountPanel
-from lib.panel.priority_target import PriorityTargetPanel
-from lib.panel.region import RegionPanel
-from lib.dialog.glossary_n_credits import dialog_glossary_n_credits
+from util.filter_by_geometry import filter_by_geometry
+from util.get_divisor import get_divisor
+from util.click_parser import parse_click
+from load_data.geodata import GeoData
+from util.filter_vertical import filter_by_vertical
+from util.format_helper import format_currency
+from util.get_project_root import get_project_root
+from load_data.dealer import DealerData
+from load_data.dealer_customer import DealerCustomerData
+from load_data.key_account import KeyAccountData
+from load_data.priority_target import PriorityTargetData
+from load_data.region import RegionData
+from panel.dealer import DealerPanel
+from panel.key_account import KeyAccountPanel
+from panel.priority_target import PriorityTargetPanel
+from panel.region import RegionPanel
+from dialog.glossary_n_credits import dialog_glossary_n_credits
 
 
 # code by me

@@ -3,8 +3,8 @@
 import streamlit as st
 import pandas as pd
 
-from lib.get_active_verticals import GetActiveVerticalString
-from lib.format_helper import format_currency, format_number
+from util.get_active_verticals import GetActiveVerticalString
+from util.format_helper import format_currency, format_number
 
 class PriorityTargetPanel:
     """Handles the rendering of the priority target details panel in the Streamlit app."""

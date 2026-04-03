@@ -4,9 +4,9 @@ import streamlit as st
 import pandas as pd
 from millify import millify
 
-from lib.get_active_verticals import GetActiveVerticalString
-from lib.grouped_bar_chart import grouped_bar_chart
-from lib.pie_chart import pie_chart_with_percentage
+from util.get_active_verticals import GetActiveVerticalString
+from util.grouped_bar_chart import grouped_bar_chart
+from util.pie_chart import pie_chart_with_percentage
 
 class RegionPanel:
     """Handles the rendering of the region details panel in the Streamlit app."""

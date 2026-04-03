@@ -3,7 +3,7 @@
 import pycountry
 import geopandas as gpd
 
-from lib.get_project_root import get_project_root
+from util.get_project_root import get_project_root
 
 GEODATA_PATH = get_project_root() / 'geodata'
 
