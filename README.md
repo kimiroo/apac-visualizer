@@ -3,55 +3,28 @@
 
 Visualizer for dealer and plant overview
 
-## Requirements
-- Python 3.14 (Other recent Python versions **SHOULD** work, but are **NOT TESTED**.)
-- Git (Optional)
+See [kimiroo/apac-visualizer-admin](https://github.com/kimiroo/apac-visualizer-admin) for Admin Console image
 
-
-## Setting up requirements
-
-### Installing Python 3
-1. Open `cmd` or `PowerShell`
-2. Type following commands:
-```cmd
-winget install -e --id 9NQ7512CXL7T
-py install 3.14
+Sample docker-compose.yaml file
+```yaml
+services:
+    apac-visualizer:
+        image: ghcr.io/kimiroo/apac-visualizer:v1.0.0
+        container_name: apac-visualizer
+        ports:
+            - "8501:8501"
+        volumes:
+            - "apac_visualizer_data:/data:ro"
+        depends_on:
+            apac-visualizer-admin:
+                condition: service_healthy
+    apac-visualizer-admin:
+        image: ghcr.io/kimiroo/apac-visualizer-admin:v1.0.0
+        container_name: apac-visualizer-admin
+        ports:
+            - "8502:8501"
+        volumes:
+            - "apac_visualizer_data:/data"
+volumes:
+    apac_visualizer_data:
 ```
-
-### Alternative way to install Python 3
-If your organization doesn't allow Microsoft Store or you can't use `winget`,
-you should manually install Python from [python.org](python.org).
-1. Head to [https://www.python.org/downloads/release/python-3143/](https://www.python.org/downloads/release/python-3143/)
-2. Scroll down and download **Windows installer (64-bit)** (Or whatever python.org recommends)\
-(DO NOT download Python install manager)
-3. Install Python 3.14 with default options
-
-### Installing Git
-If you want to easily copy and update source code, you should install Git.
-1. Open `cmd` or `PowerShell`
-2. Type following commands:
-```cmd
-winget install -e --id Git.Git --source winget
-```
-
-### Alternative way to install Git
-If you previously have used alternate method to install Python 3, you should follow this method to install Git as well.
-1. Head to [https://git-scm.com/install/windows](https://git-scm.com/install/windows) and download Git installer
-2. Install Git with default options
-
-## Launching APAC Visualizer++
-1. If you have installed Git, open `cmd` or `PowerShell` and `cd` into desired location.\
-(e.g. If you want to store files at Desktop, type `cd "C:\Users\[USERNAME]\Desktop"`. `[USERNAME]` is your username.)
-2. Run `git clone https://github.com/kimiroo/apac-visualizer` in your command prompt to retrieve latest files.
-3. Copy `config.sample.yaml` to `config.yaml` in application root directory.
-3. Launch `run.bat` to start the main application. Python will automatically open a web app in your browser's new tab.
-
-If you haven't installed Git, follow this guide instead.
-1. Navigate to [https://github.com/kimiroo/apac-visualizer](https://github.com/kimiroo/apac-visualizer)
-2. Click `Code` then click `Download ZIP` to download files.
-3. Extract contents.
-4. Copy `config.sample.yaml` to `config.yaml` in application root directory.
-5. Launch `run.bat` to start the main application.
-
-## Updating geodata
-If geodata (e.g. province) is outdated, run `get_geodata.bat` to retrieve latest geodata.
