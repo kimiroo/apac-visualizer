@@ -9,7 +9,7 @@ Sample docker-compose.yaml file
 ```yaml
 services:
     apac-visualizer:
-        image: ghcr.io/kimiroo/apac-visualizer:v1.0.0
+        image: ghcr.io/kimiroo/apac-visualizer:latest
         container_name: apac-visualizer
         ports:
             - "8501:8501"
@@ -19,7 +19,7 @@ services:
             apac-visualizer-admin:
                 condition: service_healthy
     apac-visualizer-admin:
-        image: ghcr.io/kimiroo/apac-visualizer-admin:v1.0.0
+        image: ghcr.io/kimiroo/apac-visualizer-admin:latest
         container_name: apac-visualizer-admin
         ports:
             - "8502:8501"
