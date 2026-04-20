@@ -3,7 +3,7 @@
 import pandas as pd
 import altair as alt
 
-def grouped_bar_chart(df: pd.DataFrame, x_config: tuple[str, str], y_config: tuple[str, str], format_string: str) -> alt.Chart:
+def grouped_bar_chart(df: pd.DataFrame, x_config: tuple[str, str], y_config: tuple[str, str], currency: str) -> alt.Chart:
     """Generates a grouped bar chart.
 
     Args:
@@ -20,9 +20,22 @@ def grouped_bar_chart(df: pd.DataFrame, x_config: tuple[str, str], y_config: tup
         # Use xOffset for grouped bar alignment
         xOffset='Type:N',
         x=alt.X(x_config[0], title=x_config[1]),
-        y=alt.Y(y_config[0], title=y_config[1], axis=alt.Axis(format=format_string)),
+        y=alt.Y(y_config[0], title=y_config[1],
+            axis=alt.Axis(
+                labelExpr=f"format(datum.value, ',.2f') + '{f' {currency}' if currency else ''}'"
+            )
+        ),
         color=alt.Color('Type:N', scale=alt.Scale(range=['#1F77B4', "#B8B8B8"])),
-        tooltip=alt.Tooltip(format=format_string)
+        tooltip=[
+            alt.Tooltip(x_config[0]),
+            alt.Tooltip('Type'),
+            alt.Tooltip(
+                'Value',
+                format=',.2f',
+                formatType='number',
+                title=f'Value{f' ({currency})' if currency else ''}'
+            )
+        ]
     ).properties(
         width='container', # Fit to Streamlit container width
         height=300

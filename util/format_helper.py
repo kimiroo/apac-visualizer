@@ -1,7 +1,7 @@
-def format_currency(value, symbol='$'):
+def format_currency(value, symbol='USD'):
     """Safe currency formatting for integers, floats, and nulls."""
     try:
-        return f"{symbol}{float(value):,.2f}"
+        return f"{float(value):,.2f} {symbol}"
     except (ValueError, TypeError):
         return value
 

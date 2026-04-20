@@ -3,7 +3,7 @@
 import pandas as pd
 import altair as alt
 
-def pie_chart_with_percentage(df: pd.DataFrame, format_string: str) -> alt.Chart | None:
+def pie_chart_with_percentage(df: pd.DataFrame, currency: str) -> alt.Chart | None:
     """Generates a pie chart with percentage labels.
 
     Args:
@@ -29,7 +29,12 @@ def pie_chart_with_percentage(df: pd.DataFrame, format_string: str) -> alt.Chart
         color=alt.Color(field='Vertical', type='nominal'),
         tooltip=[
             alt.Tooltip('Vertical'),
-            alt.Tooltip('Value', format=format_string),
+            alt.Tooltip(
+                'Value',
+                format=',.2f',
+                formatType='number',
+                title=f'Value{f' ({currency})' if currency else ''}'
+            ),
             alt.Tooltip('Percentage', format='.1f')
         ]
     )

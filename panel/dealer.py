@@ -54,9 +54,9 @@ class DealerPanel:
 
             chart = alt.Chart(performance_df).mark_bar().encode(
                 x=alt.X('Revenue:N', title='Revenue'),
-                y=alt.Y('Value:Q', title='Value', axis=alt.Axis(format='$,.2f')),
+                y=alt.Y('Value:Q', title='Value', axis=alt.Axis(format=f'~,.2f {self._config['currency']}')),
                 color=alt.Color('Revenue:N', scale=alt.Scale(range=['#1F77B4', '#B8B8B8'])),
-                tooltip=alt.Tooltip(format='$,.2f')
+                tooltip=alt.Tooltip(format=f'~,.2f {self._config['currency']}')
             )
 
             st.altair_chart(chart, width='stretch')
@@ -114,7 +114,7 @@ class DealerPanel:
         df_c = df_c[['name', 'sale_value', 'sale_date', 'sale_model']].copy()
 
         # Sort
-        df_c = df_c.sort_values(by=['sale_value'], ascending=False)
+        #df_c = df_c.sort_values(by=['sale_value'], ascending=False)
 
         # Reset index and convert to human-friendly numbering
         df_c = df_c.reset_index(drop=True)
@@ -129,7 +129,7 @@ class DealerPanel:
                 'name': st.column_config.TextColumn('Name', width='medium'),
                 'sale_value': st.column_config.NumberColumn(
                     'Sale Value',
-                    format='$%,.2f',
+                    format=f'%,.2f {self._config['currency']}',
                     width=150
                 ),
                 'sale_date': st.column_config.DateColumn('Sale Date'),

@@ -653,7 +653,7 @@ with col1:
         df_region_heatmap[target_col] = df_region_heatmap[target_col] / divisor
 
         # Generate legend
-        dynamic_legend_name = f"{selected_heatmap_value['name']} ({selected_heatmap_vertical}) (Unit: {unit}$)"
+        dynamic_legend_name = f'{selected_heatmap_value['name']} ({selected_heatmap_vertical}) (Unit: {unit} ({config['currency']}))'
 
         # Draw heatmap
         target_col = f'{selected_heatmap_vertical}_{selected_heatmap_value["value"]}'

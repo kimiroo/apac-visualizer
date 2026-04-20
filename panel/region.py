@@ -65,14 +65,14 @@ class RegionPanel:
             total_prj_rev = row[f'{vertical}_total_market_value']
             dealer_cnt = len(df_dealers)
 
-            st.metric(label='Total Market Value', value=f'${millify(total_prj_rev, precision=1).upper()}')
+            st.metric(label='Total Market Value', value=f'{millify(total_prj_rev, precision=1).upper()} {self._config['currency']}')
             st.metric(label='Dealer Count', value=dealer_cnt)
 
         with col2:
             actual_dealer_rev = row[f'{vertical}_actual_dealer_revenue']
             plant_cnt = row[f'{vertical}_plant_cnt']
 
-            st.metric(label=f'Actual Dealer Revenue', value=f'${millify(actual_dealer_rev, precision=1).upper()}')
+            st.metric(label=f'Actual Dealer Revenue', value=f'{millify(actual_dealer_rev, precision=1).upper()} {self._config['currency']}')
             st.metric(label='Plant Count', value=int(plant_cnt))
 
 
@@ -95,7 +95,7 @@ class RegionPanel:
                 df_revenue,
                 ('Vertical:N', 'Verticals'), # X-Axis config
                 ('Value:Q', 'Value'),        # Y-Axis config
-                '$,.2f'
+                self._config['currency']
             )
 
             st.altair_chart(chart_revenue, width='stretch')
@@ -116,7 +116,7 @@ class RegionPanel:
             df_market_value,
             ('Vertical:N', 'Verticals'), # X-Axis config
             ('Value:Q', 'Market Value'), # Y-Axis config
-            '$,.2f'
+            self._config['currency']
         )
 
         st.altair_chart(chart_market_value, width='stretch')
@@ -138,7 +138,7 @@ class RegionPanel:
                         plot_share.append({'Vertical': v, 'Value': val})
 
                 df_share = pd.DataFrame(plot_share)
-                chart_share = pie_chart_with_percentage(df_share, '$,.2f')
+                chart_share = pie_chart_with_percentage(df_share, self._config['currency'])
 
                 # Draw pie chart
                 if chart_share:
@@ -177,7 +177,7 @@ class RegionPanel:
                 'profile': st.column_config.TextColumn('Profile', width=150),
                 'actual_revenue': st.column_config.NumberColumn(
                     'Actual Revenue',
-                    format='$%,.2f',
+                    format=f'%,.2f {self._config['currency']}',
                     width=150
                 ),
                 'address': st.column_config.TextColumn('Address', width='medium'),
@@ -226,7 +226,7 @@ class RegionPanel:
                 'name': st.column_config.TextColumn('Name', width='medium'),
                 'value': st.column_config.NumberColumn(
                     'Value',
-                    format='$%,.2f',
+                    format=f'%,.2f {self._config['currency']}',
                     width=150
                 ),
                 'address': st.column_config.TextColumn('Address', width='medium'),
