@@ -62,18 +62,18 @@ class RegionPanel:
         col1, col2 = st.columns(2)
 
         with col1:
-            total_prj_rev = row[f'{vertical}_total_market_value']
+            total_prj_val = row[f'{vertical}_total_project_value']
             dealer_cnt = len(df_dealers)
 
-            st.metric(label='Total Market Value', value=f'{millify(total_prj_rev, precision=1).upper()} {self._config['currency']}')
+            st.metric(label='Total Project Value', value=f'{millify(total_prj_val, precision=1).upper()} {self._config['currency']}')
             st.metric(label='Dealer Count', value=dealer_cnt)
 
         with col2:
             actual_dealer_rev = row[f'{vertical}_actual_dealer_revenue']
-            plant_cnt = row[f'{vertical}_plant_cnt']
+            project_cnt = row[f'{vertical}_project_cnt']
 
             st.metric(label=f'Actual Dealer Revenue', value=f'{millify(actual_dealer_rev, precision=1).upper()} {self._config['currency']}')
-            st.metric(label='Plant Count', value=int(plant_cnt))
+            st.metric(label='Project Count', value=int(project_cnt))
 
 
         ### Actual (vs Projected) Dealer Revenue
@@ -101,21 +101,21 @@ class RegionPanel:
             st.altair_chart(chart_revenue, width='stretch')
 
 
-        ### Potential vs Actual Market Value
-        st.write('##### 📊 Market Value')
+        ### Market/Project Value
+        st.write('##### 📊 Market/Project Value')
 
         # Create a long-form dataframe for Altair
         plot_market_value = []
         for v in verticals:
-            plot_market_value.append({'Vertical': v, 'Type': 'Potential', 'Value': row[f'{v}_potential_market_value']})
-            plot_market_value.append({'Vertical': v, 'Type': 'Total', 'Value': row[f'{v}_total_market_value']})
+            plot_market_value.append({'Vertical': v, 'Type': 'Potential Market Value', 'Value': row[f'{v}_potential_market_value']})
+            plot_market_value.append({'Vertical': v, 'Type': 'Total Project Value', 'Value': row[f'{v}_total_project_value']})
 
         df_market_value = pd.DataFrame(plot_market_value)
 
         chart_market_value = grouped_bar_chart(
             df_market_value,
             ('Vertical:N', 'Verticals'), # X-Axis config
-            ('Value:Q', 'Market Value'), # Y-Axis config
+            ('Value:Q', 'Value'), # Y-Axis config
             self._config['currency']
         )
 
@@ -133,7 +133,7 @@ class RegionPanel:
                 plot_share = []
 
                 for v in verticals_no_total:
-                    val = row[f'{v}_total_market_value']
+                    val = row[f'{v}_total_project_value']
                     if val > 0:
                         plot_share.append({'Vertical': v, 'Value': val})
 

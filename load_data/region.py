@@ -81,10 +81,10 @@ class RegionData:
 
         for vertical in self._config['vertical'] + extra_headers:
             columns = [
-                f'{vertical}_plant_cnt',
+                f'{vertical}_project_cnt',
                 f'{vertical}_projected_dealer_revenue',
                 f'{vertical}_potential_market_value',
-                f'{vertical}_total_market_value'
+                f'{vertical}_total_project_value'
             ]
 
             columns_region = columns_region + columns
